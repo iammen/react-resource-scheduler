@@ -1,4 +1,4 @@
-import { Event, Resource } from '../types';
+import { Event, Resource } from '../src/types';
 
 const DemoData = {
   resources: [

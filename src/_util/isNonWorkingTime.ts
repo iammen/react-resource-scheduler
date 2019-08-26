@@ -1,10 +1,9 @@
 import { SchedulerData } from '../ScdulerData';
 import { CellUnits } from '../enums';
+import moment from 'moment';
 
-export const isNonWorkingTime = (schedulerData: SchedulerData, time: string) => {
-  const { localeMoment } = schedulerData;
-
-  if (schedulerData.cellUnit === CellUnits.Hour) {
+export const isNonWorkingTime = (time: string, localeMoment: typeof moment, cellUnit: number) => {
+  if (cellUnit === CellUnits.Hour) {
     const hour = localeMoment(time).hour();
     if (hour < 9 || hour > 18) {
       return true;

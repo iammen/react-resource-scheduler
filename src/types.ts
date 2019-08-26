@@ -1,3 +1,15 @@
+export interface CellData {
+  nonWorkingTime: boolean;
+  time: string;
+  start: string;
+  end: string;
+  count: number;
+  addMore: number;
+  addMoreIndex: number;
+  events: Event[];
+  text?: string;
+}
+
 export interface CustomSchedulerDate {
   startDate: string;
   endDate: string;
@@ -35,10 +47,12 @@ export interface Resource {
 export interface SchedulerDataConfig {
   agendaMaxEventWidth: number;
   agendaResourceTableWidth: number;
+  besidesWidth: number;
   calendarPopoverEnabled: boolean;
   checkConflict: boolean;
   creatable: boolean;
   crossResourceMove: boolean;
+  customCellWidth?: string;
   customMaxEvents?: any;
   dayCellWidth: number;
   dayMaxEvents: number;
@@ -98,23 +112,11 @@ export interface SlotData {
   hasSummary: boolean;
   rowMaxCount: number;
   rowHeight: number;
-  dates: SlotDate[];
+  cells: CellData[];
   indent: number;
   hasChildren: boolean;
   expanded: boolean;
   render: boolean;
-}
-
-export interface SlotDate {
-  nonWorkingTime: boolean;
-  time: string;
-  start: string;
-  end: string;
-  count: number;
-  addMore: number;
-  addMoreIndex: number;
-  events: Event[];
-  text?: string;
 }
 
 export interface View {
