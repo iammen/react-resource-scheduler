@@ -1,6 +1,7 @@
 import { SchedulerData } from '../ScdulerData';
+import { Event } from '../interface';
 
-export const getEventText = (schedulerData: SchedulerData, event: any) => {
+export const getEventText = (schedulerData: SchedulerData, event: Event) => {
   if (!schedulerData.isEventPerspective) {
     return event.title;
   }

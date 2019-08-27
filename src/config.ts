@@ -1,5 +1,8 @@
-import { ViewTypes, SummaryPositions } from './enums';
-import { SchedulerDataConfig, View } from './types';
+import { ViewTypes, SummaryPositions } from './enum';
+import { SchedulerDataConfig, View } from './interface';
+
+export const DATE_FORMAT = 'YYYY-MM-DD';
+export const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
 export default {
   schedulerWidth: '100%',

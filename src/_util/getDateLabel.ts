@@ -1,15 +1,22 @@
 import { SchedulerData } from '../ScdulerData';
-import { ViewTypes } from '../enums';
+import { ViewTypes } from '../enum';
 
-export const getDateLabel = (schedulerData: SchedulerData, viewType: number, startDate: string, endDate: string) => {
+export const getDateLabel = (
+  schedulerData: SchedulerData,
+  viewMode: string,
+  startDate: string,
+  endDate: string,
+) => {
   const start = schedulerData.localeMoment(startDate);
   const end = schedulerData.localeMoment(endDate);
   let dateLabel = start.format('MMM D, YYYY');
 
   if (
-    viewType === ViewTypes.Week ||
+    viewMode === ViewTypes.Week ||
     (start !== end &&
-      (viewType === ViewTypes.Custom || viewType === ViewTypes.Custom1 || viewType === ViewTypes.Custom2))
+      (viewMode === ViewTypes.Custom1 ||
+        viewMode === ViewTypes.Custom2 ||
+        viewMode === ViewTypes.Custom3))
   ) {
     dateLabel = `${start.format('MMM D')}-${end.format('D, YYYY')}`;
     if (start.month() !== end.month()) {
@@ -18,11 +25,11 @@ export const getDateLabel = (schedulerData: SchedulerData, viewType: number, sta
     if (start.year() !== end.year()) {
       dateLabel = `${start.format('MMM D, YYYY')}-${end.format('MMM D, YYYY')}`;
     }
-  } else if (viewType === ViewTypes.Month) {
+  } else if (viewMode === ViewTypes.Month) {
     dateLabel = start.format('MMMM YYYY');
-  } else if (viewType === ViewTypes.Quarter) {
+  } else if (viewMode === ViewTypes.Quarter) {
     dateLabel = `${start.format('MMM D')}-${end.format('MMM D, YYYY')}`;
-  } else if (viewType === ViewTypes.Year) {
+  } else if (viewMode === ViewTypes.Year) {
     dateLabel = start.format('YYYY');
   }
 

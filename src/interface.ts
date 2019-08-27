@@ -10,6 +10,12 @@ export interface CellData {
   text?: string;
 }
 
+export interface CellConfig {
+  cellWidth: number | string;
+  maxEvents: number;
+  resourceTableWidth: number | string;
+}
+
 export interface CustomSchedulerDate {
   startDate: string;
   endDate: string;
@@ -47,12 +53,11 @@ export interface Resource {
 export interface SchedulerDataConfig {
   agendaMaxEventWidth: number;
   agendaResourceTableWidth: number;
-  besidesWidth: number;
   calendarPopoverEnabled: boolean;
   checkConflict: boolean;
   creatable: boolean;
   crossResourceMove: boolean;
-  customCellWidth?: string;
+  customCellWidth?: number | string;
   customMaxEvents?: any;
   dayCellWidth: number;
   dayMaxEvents: number;
@@ -90,6 +95,7 @@ export interface SchedulerDataConfig {
   summaryColor: string;
   summaryPosition: number;
   tableHeaderHeight: number;
+  taskName: string;
   views: View[];
   weekCellWidth: number | string;
   weekMaxEvents: number;
@@ -104,7 +110,7 @@ export interface SchedulerHeader {
   time: string;
 }
 
-export interface SlotData {
+export interface Slot {
   id: number;
   name: string;
   parentId?: number;
@@ -121,7 +127,22 @@ export interface SlotData {
 
 export interface View {
   viewName?: string;
-  viewType: number;
+  viewType: string;
   showAgenda: boolean;
   isEventPerspective: boolean;
+}
+
+export interface ViewRender {
+  cellWidth: ViewType<number | string>;
+  maxEvents: ViewType<number>;
+  resourceTableWidth: ViewType<number | string>;
+}
+
+export interface ViewType<T> {
+  day?: T;
+  week?: T;
+  month?: T;
+  quarter?: T;
+  year?: T;
+  custom?: T;
 }

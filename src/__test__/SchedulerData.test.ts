@@ -1,5 +1,5 @@
 import { SchedulerData } from '../ScdulerData';
-import { ViewTypes } from '../enums';
+import { ViewTypes } from '../enum';
 import DemoData from '../../example/DemoData';
 
 test('Test SchedulerData.initializeSlotRenderData method', () => {
