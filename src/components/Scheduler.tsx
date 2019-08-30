@@ -44,8 +44,6 @@ export interface SchedulerProps {
   leftCustomHeader: React.ReactNode;
   rightCustomHeader: React.ReactNode;
   styles: Styles;
-  viewEvent2Text?: string;
-  viewEventText?: string;
   viewRender?: ViewRender;
   viewType?: ViewType;
   width?: number | string;
@@ -93,11 +91,13 @@ interface SchedulerStates {
 }
 
 export default class Scheduler extends Component<SchedulerProps, SchedulerStates> {
-  static defaultProps = {
+  static defaultProps: Partial<SchedulerProps> = {
     agendaView: {},
     besidesWidth: 20,
-    displayType: DisplayTypes.Task,
+    displayType: 'task',
     headerFormat: 'ddd M/D',
+    leftCustomHeader: undefined,
+    rightCustomHeader: undefined,
     styles: {
       cellWidth: 40,
       headerHeight: 40,

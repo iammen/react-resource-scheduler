@@ -1,5 +1,5 @@
 import { SchedulerData } from '../ScdulerData';
-import { CellUnits } from '../enums';
+import { CellUnits } from '../enum';
 import moment from 'moment';
 
 export const isNonWorkingTime = (time: string, localeMoment: typeof moment, cellUnit: number) => {
