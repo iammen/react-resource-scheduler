@@ -1,9 +1,9 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import Scheduler from '../components/Scheduler';
-import { SchedulerData } from '../ScdulerData';
-import DemoData from '../../example/DemoData';
-import { ViewTypes } from '../enum';
+import Scheduler from '../Scheduler';
+import { SchedulerData } from '../../ScdulerData';
+import DemoData from '../../../example/DemoData';
+import { ViewTypes } from '../../enum';
 
 test('Scheduler component should render', () => {
   const schedulerData = new SchedulerData('2017-12-18', ViewTypes.Week);

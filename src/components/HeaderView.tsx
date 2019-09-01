@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import * as PropTypes from 'prop-types';
 import { CellUnits } from '../enum';
-import { SchedulerContext } from '../SchedulerContext';
+import { useSchedulerContext } from '../SchedulerContext';
 
 export interface HeaderViewProps {
   format?: string;
@@ -9,101 +9,97 @@ export interface HeaderViewProps {
   width: number;
 }
 
-export default class HeaderView extends Component<HeaderViewProps, {}> {
-  static propTypes = {
-    format: PropTypes.string,
-    height: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired,
-  };
+const HeaderView: React.FC<HeaderViewProps> = props => {
+  const context = useSchedulerContext();
 
-  static defaultProps = {
-    format: 'ddd M/D',
-  };
+  if (context.styles && context.source) {
+    const { headers, cellUnit, config, localeMoment } = context.source;
+    const { format, height, width } = props;
+    const minuteStepsInHour = context.source.getMinuteStepsInHour();
 
-  render() {
-    return (
-      <SchedulerContext.Consumer>
-        {value => {
-          if (value.styles && value.source) {
-            const { headers, cellUnit, config, localeMoment } = value.source;
-            const { format, height, width } = this.props;
-            const minuteStepsInHour = value.source.getMinuteStepsInHour();
+    let headerList = [];
+    let style = {};
+    if (cellUnit === CellUnits.Hour) {
+      headerList = headers.map((item, index) => {
+        if (index % minuteStepsInHour === 0) {
+          const datetime = localeMoment(item.time);
+          const isCurrentTime = datetime.isSame(new Date(), 'hour');
 
-            let headerList = [];
-            let style = {};
-            if (cellUnit === CellUnits.Hour) {
-              headerList = headers.map((item, index) => {
-                if (index % minuteStepsInHour === 0) {
-                  const datetime = localeMoment(item.time);
-                  const isCurrentTime = datetime.isSame(new Date(), 'hour');
+          style = item.nonWorkingTime
+            ? {
+                width: width * minuteStepsInHour,
+                color: config.nonWorkingTimeHeadColor,
+                backgroundColor: config.nonWorkingTimeHeadBgColor,
+              }
+            : { width: width * minuteStepsInHour };
 
-                  style = item.nonWorkingTime
-                    ? {
-                        width: width * minuteStepsInHour,
-                        color: config.nonWorkingTimeHeadColor,
-                        backgroundColor: config.nonWorkingTimeHeadBgColor,
-                      }
-                    : { width: width * minuteStepsInHour };
-
-                  if (index === headers.length - minuteStepsInHour) {
-                    style = !!item.nonWorkingTime
-                      ? {
-                          color: config.nonWorkingTimeHeadColor,
-                          backgroundColor: config.nonWorkingTimeHeadBgColor,
-                        }
-                      : {};
-                  }
-
-                  const textFormats = format ? format.split('\n').map(f => datetime.format(f)) : [];
-                  const pList = textFormats.map((str, i) => <div key={i}>{str}</div>);
-
-                  return (
-                    <th key={item.time} className="header3-text" style={style}>
-                      <div>{pList}</div>
-                    </th>
-                  );
+          if (index === headers.length - minuteStepsInHour) {
+            style = !!item.nonWorkingTime
+              ? {
+                  color: config.nonWorkingTimeHeadColor,
+                  backgroundColor: config.nonWorkingTimeHeadBgColor,
                 }
-              });
-            } else {
-              headerList = headers.map((item, index) => {
-                const datetime = localeMoment(item.time);
-                style = !!item.nonWorkingTime
-                  ? {
-                      width,
-                      color: config.nonWorkingTimeHeadColor,
-                      backgroundColor: config.nonWorkingTimeHeadBgColor,
-                    }
-                  : { width };
-                if (index === headers.length - 1) {
-                  style = !!item.nonWorkingTime
-                    ? {
-                        color: config.nonWorkingTimeHeadColor,
-                        backgroundColor: config.nonWorkingTimeHeadBgColor,
-                      }
-                    : {};
-                }
-
-                const textFormats = format ? format.split('\n').map(f => datetime.format(f)) : [];
-                const pList = textFormats.map((hf, i) => <div key={i}>{item}</div>);
-
-                return (
-                  <th key={item.time} className="header3-text" style={style}>
-                    <div>{pList}</div>
-                  </th>
-                );
-              });
-            }
-
-            return (
-              <thead>
-                <tr style={{ height }}>{headerList}</tr>
-              </thead>
-            );
-          } else {
-            return null;
+              : {};
           }
-        }}
-      </SchedulerContext.Consumer>
+
+          const textFormats = format ? format.split('\n').map(f => datetime.format(f)) : [];
+          const pList = textFormats.map((str, i) => <div key={i}>{str}</div>);
+
+          return (
+            <th key={item.time} className="header3-text" style={style}>
+              <div>{pList}</div>
+            </th>
+          );
+        }
+      });
+    } else {
+      headerList = headers.map((item, index) => {
+        const datetime = localeMoment(item.time);
+        style = !!item.nonWorkingTime
+          ? {
+              width,
+              color: config.nonWorkingTimeHeadColor,
+              backgroundColor: config.nonWorkingTimeHeadBgColor,
+            }
+          : { width };
+        if (index === headers.length - 1) {
+          style = !!item.nonWorkingTime
+            ? {
+                color: config.nonWorkingTimeHeadColor,
+                backgroundColor: config.nonWorkingTimeHeadBgColor,
+              }
+            : {};
+        }
+
+        const textFormats = format ? format.split('\n').map(f => datetime.format(f)) : [];
+        const pList = textFormats.map((txt, i) => <div key={i}>{txt}</div>);
+
+        return (
+          <th key={item.time} className="header3-text" style={style}>
+            <div>{pList}</div>
+          </th>
+        );
+      });
+    }
+
+    return (
+      <thead>
+        <tr style={{ height }}>{headerList}</tr>
+      </thead>
     );
+  } else {
+    return null;
   }
-}
+};
+
+HeaderView.propTypes = {
+  format: PropTypes.string,
+  height: PropTypes.number.isRequired,
+  width: PropTypes.number.isRequired,
+};
+
+HeaderView.defaultProps = {
+  format: 'ddd M/D',
+};
+
+export default HeaderView;

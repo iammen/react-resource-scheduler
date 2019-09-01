@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { SchedulerData } from './ScdulerData';
 import { Styles } from './components/Scheduler';
 
@@ -8,3 +8,5 @@ export interface SchedulerDataContext {
 }
 
 export const SchedulerContext = React.createContext<Partial<SchedulerDataContext>>({});
+
+export const useSchedulerContext = () => useContext(SchedulerContext);

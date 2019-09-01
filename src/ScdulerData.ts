@@ -700,11 +700,6 @@ export class SchedulerData {
     return initialData;
   }
 
-  private isContentViewResponsive() {
-    const contentCellWidth = this.getContentCellConfigWidth();
-    return contentCellWidth && contentCellWidth.toString().endsWith('%');
-  }
-
   private resolveDateRange(num: number, date?: string) {
     if (date) {
       this.selectDate = this.localeMoment(date).format(DATE_FORMAT);
