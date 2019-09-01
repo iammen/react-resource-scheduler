@@ -92,7 +92,7 @@ interface SchedulerStates {
 
 export default class Scheduler extends Component<SchedulerProps, SchedulerStates> {
   static defaultProps: Partial<SchedulerProps> = {
-    agendaView: {},
+    agendaView: undefined,
     besidesWidth: 20,
     displayType: 'task',
     headerFormat: 'ddd M/D',
