@@ -2,7 +2,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import Scheduler from '../Scheduler';
 import { SchedulerData } from '../../ScdulerData';
-import DemoData from '../../../example/DemoData';
+import DemoData from '../../__test__/DemoData';
 import { ViewTypes } from '../../enum';
 
 test('Scheduler component should render', () => {

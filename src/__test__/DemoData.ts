@@ -1,4 +1,4 @@
-import { Event, Resource } from '../src/interface';
+import { Event, Resource } from '../interface';
 
 const DemoData = {
   resources: [

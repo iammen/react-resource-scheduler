@@ -10,12 +10,12 @@ export interface HeaderViewProps {
 }
 
 const HeaderView: React.FC<HeaderViewProps> = props => {
-  const context = useSchedulerContext();
+  const contextValue = useSchedulerContext();
 
-  if (context.styles && context.source) {
-    const { headers, cellUnit, config, localeMoment } = context.source;
+  if (contextValue.styles && contextValue.source) {
+    const { headers, cellUnit, config, localeMoment } = contextValue.source;
     const { format, height, width } = props;
-    const minuteStepsInHour = context.source.getMinuteStepsInHour();
+    const minuteStepsInHour = contextValue.source.getMinuteStepsInHour();
 
     let headerList = [];
     let style = {};

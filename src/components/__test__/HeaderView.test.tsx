@@ -4,7 +4,7 @@ import HeaderView from '../HeaderView';
 import { SchedulerData } from '../../ScdulerData';
 import * as OurContext from '../../SchedulerContext';
 import { ViewTypes } from '../../enum';
-import DemoData from '../../../example/DemoData';
+import DemoData from '../../__test__/DemoData';
 
 describe('HeaderView with SchedulerContext', () => {
   const styles = {
