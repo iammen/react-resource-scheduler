@@ -1,5 +1,5 @@
-import moment, { Moment } from 'moment';
-import { rrulestr, RRuleSet } from 'rrule';
+import moment from 'moment';
+import { rrulestr } from 'rrule';
 import config from './config';
 import {
   CellData,
@@ -267,7 +267,7 @@ export class SchedulerData {
 
       if (slots.length > 0) {
         const slot = slots[0];
-        const span = this.getSpan(event.start, event.end);
+        // const span = this.getSpan(event.start, event.end);
         const eventStart = this.localeMoment(event.start);
         const eventEnd = this.localeMoment(event.end);
         let indx = -1;
@@ -399,13 +399,13 @@ export class SchedulerData {
     }
   }
 
-  private createEvent(render: any, span: any, event: Event) {
+  /* private createEvent(render: any, span: any, event: Event) {
     return {
       render,
       span,
       event,
     };
-  }
+  } */
 
   private detachEvent(event: Event) {
     const index = this.events.indexOf(event);
@@ -447,7 +447,7 @@ export class SchedulerData {
       : this.config.customMaxEvents;
   }
 
-  private getContentCellConfigWidth() {
+  /* private getContentCellConfigWidth() {
     return this.viewType === ViewTypes.Week
       ? this.config.weekCellWidth
       : this.viewType === ViewTypes.Day
@@ -459,7 +459,7 @@ export class SchedulerData {
       : this.viewType === ViewTypes.Quarter
       ? this.config.quarterCellWidth
       : this.config.customCellWidth;
-  }
+  } */
 
   private getEventSlotId(event: Event) {
     return this.isEventPerspective ? this.getEventGroupId(event) : event.resourceId;

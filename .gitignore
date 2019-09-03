@@ -1,10 +1,8 @@
 /node_modules
-/lib
-
-/example/node_modules
-/example/public
-/example/src
-/example/yarn.lock
+/build
+/dist
+/example
 
 package-lock.json
+yarn.lock
 SyncSettings.ffs_gui

@@ -21,7 +21,7 @@ import { SchedulerData } from '../ScdulerData';
 import { SchedulerContext } from '../SchedulerContext';
 import { getScrollSpecialMoment } from '../_util/getScrollSpecialMoment';
 import { ViewRender } from '../interface';
-import { ViewTypes, DisplayTypes } from '../enum';
+import { ViewTypes } from '../enum';
 
 export type ViewType = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
 export type DisplayType = 'agenda' | 'resource' | 'task';
@@ -185,8 +185,8 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
       resourceScrollbarWidth: 17,
       scrollLeft: 0,
       scrollTop: 0,
-      documentWidth: document.documentElement.clientWidth,
-      documentHeight: document.documentElement.clientHeight,
+      documentWidth: document.documentElement.clientWidth || 1024,
+      documentHeight: document.documentElement.clientHeight || 768,
     };
 
     this.contentRef = React.createRef();
@@ -233,37 +233,32 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     }
   }
 
-  getCellWidthProp() {
+  getCellWidth() {
     const { viewRender, viewType } = this.props;
 
     if (viewRender) {
-      return (
-        Number(
-          viewType === ViewTypes.Week
-            ? viewRender.cellWidth.week
-            : viewType === ViewTypes.Day
-            ? viewRender.cellWidth.day
-            : viewType === ViewTypes.Month
-            ? viewRender.cellWidth.month
-            : viewType === ViewTypes.Year
-            ? viewRender.cellWidth.year
-            : viewType === ViewTypes.Quarter
-            ? viewRender.cellWidth.quarter
-            : viewRender.cellWidth.custom,
-        ) || 17
-      );
+      return viewType === ViewTypes.Week
+        ? viewRender.cellWidth.week
+        : viewType === ViewTypes.Day
+        ? viewRender.cellWidth.day
+        : viewType === ViewTypes.Month
+        ? viewRender.cellWidth.month
+        : viewType === ViewTypes.Year
+        ? viewRender.cellWidth.year
+        : viewType === ViewTypes.Quarter
+        ? viewRender.cellWidth.quarter
+        : viewRender.cellWidth.custom || 17;
     }
 
     return 17;
   }
 
   getContentCellWidth() {
-    const componentWidth = this.getSchedulerCompWidth();
-    const contentCellConfigWidth = this.getCellWidthProp();
+    const componentWidth = this.getSchedulerWidth();
+    const cellWidth = this.getCellWidth();
     return this.isContentResponsive()
-      ? (Number(componentWidth) * Number((contentCellConfigWidth || 0).toString().slice(0, -1))) /
-          100
-      : Number(contentCellConfigWidth);
+      ? (Number(componentWidth) * Number((cellWidth || 17).toString().slice(0, -1))) / 100
+      : Number(cellWidth);
   }
 
   getContentCompWidth() {
@@ -283,7 +278,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
 
   getResourceCompWidth() {
     const resourceTableWidthProp = this.getResourceTableWidthProp();
-    const componentWidth = this.getSchedulerCompWidth();
+    const componentWidth = this.getSchedulerWidth();
     let resourceTableWidth = this.isResourceResponsive()
       ? (componentWidth * Number(resourceTableWidthProp.toString().slice(0, -1))) / 100
       : resourceTableWidthProp;
@@ -320,7 +315,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     return 160;
   }
 
-  getSchedulerCompWidth() {
+  getSchedulerWidth() {
     const width = this.props.width || this.state.documentWidth;
     const baseWidth =
       this.state.documentWidth - this.props.besidesWidth > 0
@@ -465,7 +460,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     this.setState({ visible });
   };
 
-  handleWindowResize = (e: UIEvent) => {
+  handleWindowResize = () => {
     this.setState({
       documentWidth: document.documentElement.clientWidth,
       documentHeight: document.documentElement.clientHeight,
@@ -473,8 +468,8 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   };
 
   isContentResponsive() {
-    const contentCellWidth = this.getCellWidthProp();
-    return contentCellWidth.toString().endsWith('%');
+    const cellWidth = this.getCellWidth();
+    return (cellWidth || '').toString().endsWith('%');
   }
 
   isResponsive() {
@@ -541,7 +536,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   render() {
     const { dataSource, leftCustomHeader, rightCustomHeader, styles } = this.props;
     const { slots, viewType, showAgenda, isEventPerspective, config } = dataSource;
-    const width = this.getSchedulerCompWidth();
+    const width = this.getSchedulerWidth();
     const calendarPopoverEnabled = config.calendarPopoverEnabled;
 
     const dateLabel = dataSource.getDateLabel();
@@ -564,11 +559,11 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     const resourceTableWidth = this.getResourceCompWidth();
     const schedulerContainerWidth = width - resourceTableWidth + 1;
     const schedulerWidth = this.getContentCompWidth() - 1;
-    const DndResourceEvents = this.state.dndContext.getDropTarget();
-    const eventDndSource = this.state.dndContext.getDndSource();
+    // const DndResourceEvents = this.state.dndContext.getDropTarget();
+    // const eventDndSource = this.state.dndContext.getDndSource();
 
     const displayRenderData = slots.filter(o => o.render);
-    const resourceEventsList = displayRenderData.map(slot => {
+    /* const resourceEventsList = displayRenderData.map(slot => {
       return (
         <DndResourceEvents
           {...this.props}
@@ -577,7 +572,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
           dndSource={eventDndSource}
         />
       );
-    });
+    }); */
 
     const {
       contentHeight,
@@ -704,7 +699,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
               <div style={{ width: schedulerWidth, height: contentHeight }}>
                 <div className="scheduler-content">
                   <table className="scheduler-content-table">
-                    <tbody>{resourceEventsList}</tbody>
+                    <tbody>{/*resourceEventsList*/ null}</tbody>
                   </table>
                 </div>
                 <div className="scheduler-bg">
