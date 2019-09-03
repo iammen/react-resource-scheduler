@@ -1,4 +1,4 @@
-import Scheduler from './components/Scheduler';
+import Scheduler from './Scheduler';
 export * from './ScdulerData';
 export * from './config';
 export * from './enum';

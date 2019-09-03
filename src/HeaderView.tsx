@@ -1,7 +1,7 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { CellUnits } from '../enum';
-import { useSchedulerContext } from '../SchedulerContext';
+import { CellUnits } from './enum';
+import { useSchedulerContext } from './SchedulerContext';
 
 export interface HeaderViewProps {
   format?: string;
@@ -83,9 +83,11 @@ const HeaderView: React.FC<HeaderViewProps> = props => {
     }
 
     return (
-      <thead>
-        <tr style={{ height }}>{headerList}</tr>
-      </thead>
+      <table className="scheduler-bg-table">
+        <thead>
+          <tr style={{ height }}>{headerList}</tr>
+        </thead>
+      </table>
     );
   } else {
     return null;

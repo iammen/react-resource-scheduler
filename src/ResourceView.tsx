@@ -1,8 +1,8 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import Icon from 'antd/lib/icon';
-import { useSchedulerContext } from '../SchedulerContext';
-import { Slot } from '../interface';
+import { useSchedulerContext } from './SchedulerContext';
+import { Slot } from './interface';
 
 export interface ResourceViewProps {
   contentScrollbarHeight: number;
@@ -78,8 +78,8 @@ const ResourceView: React.FC<ResourceViewProps> = ({
       );
 
       return (
-        <tr key={slot.id}>
-          <td data-resource-id={slot.id} style={{ height: slot.rowHeight }}>
+        <tr key={slot.id} style={{ height: slot.rowHeight }}>
+          <td data-resource-id={slot.id}>
             <div
               title={slot.name}
               className="overflow-text header2-text"

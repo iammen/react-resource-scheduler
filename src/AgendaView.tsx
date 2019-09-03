@@ -1,7 +1,7 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import AgendaSlot from './AgendaSlot';
-import { useSchedulerContext } from '../SchedulerContext';
+import { useSchedulerContext } from './SchedulerContext';
 
 export interface AgendaViewProps {
   agendaTitle?: string;

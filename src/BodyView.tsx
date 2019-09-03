@@ -1,6 +1,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { useSchedulerContext } from '../SchedulerContext';
+import { useSchedulerContext } from './SchedulerContext';
 
 export interface BodyViewProps {
   cellWidth: number;

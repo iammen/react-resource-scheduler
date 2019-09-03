@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import Scheduler from '../src/components/Scheduler';
+import Scheduler from '../src/Scheduler';
 import DemoData from '../src/__test__/DemoData';
 import { SchedulerData } from '../src/ScdulerData';
 import { ViewTypes } from '../src/enum';

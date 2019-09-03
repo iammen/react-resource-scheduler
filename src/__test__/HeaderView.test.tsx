@@ -1,10 +1,10 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
 import HeaderView from '../HeaderView';
-import { SchedulerData } from '../../ScdulerData';
-import * as OurContext from '../../SchedulerContext';
-import { ViewTypes } from '../../enum';
-import DemoData from '../../__test__/DemoData';
+import { SchedulerData } from '../ScdulerData';
+import * as OurContext from '../SchedulerContext';
+import { ViewTypes } from '../enum';
+import DemoData from './DemoData';
 
 describe('HeaderView with SchedulerContext', () => {
   const styles = {

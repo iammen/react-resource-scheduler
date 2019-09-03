@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import AgendaCell from './AgendaCell';
-import { DATE_FORMAT } from '../config';
-import { Slot } from '../interface';
-import { useSchedulerContext } from '../SchedulerContext';
+import { DATE_FORMAT } from './config';
+import { Slot } from './interface';
+import { useSchedulerContext } from './SchedulerContext';
 
 export interface AgendaSlotProps {
   defaultValue: Slot;

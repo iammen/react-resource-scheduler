@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { SchedulerData } from './ScdulerData';
-import { Styles } from './components/Scheduler';
+import { Styles } from './Scheduler';
 
 export interface SchedulerDataContext {
   source: SchedulerData;

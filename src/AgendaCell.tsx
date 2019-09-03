@@ -3,9 +3,9 @@ import * as PropTypes from 'prop-types';
 import Popover from 'antd/lib/popover';
 import 'antd/lib/popover/style/index.css';
 import EventPopover from './EventPopover';
-import { getEventText } from '../_util/getEventText';
-import { Event } from '../interface';
-import { useSchedulerContext } from '../SchedulerContext';
+import { getEventText } from './_util/getEventText';
+import { Event } from './interface';
+import { useSchedulerContext } from './SchedulerContext';
 
 export interface AgendaCellProps {
   defaultValue: Event;

@@ -1,12 +1,12 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import ResourceView from '../ResourceView';
-import { SchedulerData } from '../../ScdulerData';
-import { ViewTypes } from '../../enum';
-import DemoData from '../../../src/__test__/DemoData';
-import * as AppContext from '../../SchedulerContext';
+import { mount } from 'enzyme';
+import AgendaView from '../AgendaView';
+import { SchedulerData } from '../ScdulerData';
+import { ViewTypes } from '../enum';
+import DemoData from './DemoData';
+import * as AppContext from '../SchedulerContext';
 
-describe('<ResourceView />', () => {
+describe('<AgendaView />', () => {
   const styles = {
     cellWidth: 40,
     headerHeight: 40,
@@ -26,7 +26,7 @@ describe('<ResourceView />', () => {
     };
 
     jest.spyOn(AppContext, 'useSchedulerContext').mockImplementation(() => contextValue);
-    const wrapper = shallow(<ResourceView contentScrollbarHeight={24} />);
-    expect(wrapper.find('.resource-table')).toBeDefined();
+    const wrapper = mount(<AgendaView />);
+    expect(wrapper.find('.header3-text').text()).toEqual('Resource Name');
   });
 });

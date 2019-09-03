@@ -124,7 +124,7 @@ export interface Slot {
 }
 
 export interface View {
-  viewName?: string;
+  title?: string;
   viewType: string;
   showAgenda: boolean;
   isEventPerspective: boolean;

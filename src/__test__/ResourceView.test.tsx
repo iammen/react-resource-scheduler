@@ -1,12 +1,12 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
-import BodyView from '../BodyView';
-import * as AppContext from '../../SchedulerContext';
-import { SchedulerData } from '../../ScdulerData';
-import { ViewTypes } from '../../enum';
-import DemoData from '../../../src/__test__/DemoData';
+import { shallow } from 'enzyme';
+import ResourceView from '../ResourceView';
+import { SchedulerData } from '../ScdulerData';
+import { ViewTypes } from '../enum';
+import DemoData from './DemoData';
+import * as AppContext from '../SchedulerContext';
 
-describe('<BodyView />', () => {
+describe('<ResourceView />', () => {
   const styles = {
     cellWidth: 40,
     headerHeight: 40,
@@ -26,7 +26,7 @@ describe('<BodyView />', () => {
     };
 
     jest.spyOn(AppContext, 'useSchedulerContext').mockImplementation(() => contextValue);
-    const wrapper = shallow(<BodyView cellWidth={24} />);
-    expect(wrapper.find('tbody')).toBeDefined();
+    const wrapper = shallow(<ResourceView contentScrollbarHeight={24} />);
+    expect(wrapper.find('.resource-table')).toBeDefined();
   });
 });
