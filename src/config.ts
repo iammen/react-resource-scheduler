@@ -8,9 +8,7 @@ export default {
   schedulerWidth: '100%',
   besidesWidth: 20,
   schedulerMaxHeight: 0,
-  tableHeaderHeight: 40,
 
-  agendaResourceTableWidth: 160,
   agendaMaxEventWidth: 100,
 
   dayResourceTableWidth: 160,

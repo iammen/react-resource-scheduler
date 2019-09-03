@@ -13,7 +13,7 @@ export interface CellData {
 export interface CellConfig {
   cellWidth: number | string;
   maxEvents: number;
-  resourceTableWidth: number | string;
+  resourceWidth: number | string;
 }
 
 export interface CustomSchedulerDate {
@@ -52,7 +52,6 @@ export interface Resource {
 
 export interface SchedulerDataConfig {
   agendaMaxEventWidth: number;
-  agendaResourceTableWidth: number;
   calendarPopoverEnabled: boolean;
   checkConflict: boolean;
   creatable: boolean;
@@ -94,7 +93,6 @@ export interface SchedulerDataConfig {
   startResizable: boolean;
   summaryColor: string;
   summaryPosition: number;
-  tableHeaderHeight: number;
   taskName: string;
   views: View[];
   weekCellWidth: number | string;
@@ -135,14 +133,13 @@ export interface View {
 export interface ViewRender {
   cellWidth: ViewType<number | string>;
   maxEvents: ViewType<number>;
-  resourceTableWidth: ViewType<number | string>;
+  resourceWidth: ViewType<number | string>;
 }
 
 export interface ViewType<T> {
-  day?: T;
-  week?: T;
-  month?: T;
-  quarter?: T;
-  year?: T;
-  custom?: T;
+  day: T;
+  week: T;
+  month: T;
+  quarter: T;
+  year: T;
 }

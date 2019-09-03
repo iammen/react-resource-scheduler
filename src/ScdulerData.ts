@@ -123,8 +123,9 @@ export class SchedulerData {
     return false;
   }
 
-  public setDate(date = moment().format(DATE_FORMAT)) {
-    this.resolveDateRange(0, date);
+  public setDate(date?: moment.Moment) {
+    const val = date ? date.format(DATE_FORMAT) : moment().format(DATE_FORMAT);
+    this.resolveDateRange(0, val);
     this.events = [];
     this.createHeaders();
     this.createSlots();

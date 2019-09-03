@@ -53,6 +53,11 @@ module.exports = {
     /* new HtmlWebpackPlugin({
       template: './example/index.html',
     }), */
+    /* new webpack.optimize.UglifyJsPlugin({
+      minimize: true,
+      sourceMap: true,
+      include: /\.min\.js$/,
+    }), */
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),

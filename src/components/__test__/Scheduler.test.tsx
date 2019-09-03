@@ -17,28 +17,41 @@ describe('<Scheduler />', () => {
 
   it('it should mock', () => {
     const wrapper = shallow(<Scheduler dataSource={dataSource} width="100%" />);
+    expect(wrapper.find('.resource-header')).toBeDefined();
     expect(wrapper.find('.scheduler-bg-table')).toBeDefined();
   });
 
-  describe('props', () => {
-    it('viewType should be "week"', () => {
+  describe('props and method', () => {
+    it('this.props.viewType should be "week"', () => {
       const wrapper = shallow(<Scheduler dataSource={dataSource} width="100%" />);
       expect((wrapper.instance() as Scheduler).props.viewType).toEqual('week');
     });
-  });
 
-  describe('getSchedulerWidth()', () => {
-    it('it should be 1024 (default scheduler width) - 20 (besidewidth) = 1004', () => {
+    it('this.getSchedulerWidth() : it should return 1004 @@@ 1024 (default scheduler width) - 20 (besidewidth) @@@', () => {
       const wrapper = mount(<Scheduler dataSource={dataSource} width="100%" />);
       const instance = wrapper.instance() as Scheduler;
       expect(instance.getSchedulerWidth()).toEqual(1004);
     });
-  });
 
-  describe('getCellWidht()', () => {
-    it('it should be "12%"', () => {
+    it('this.getResourceWidth() : it should return 200', () => {
       const wrapper = shallow(<Scheduler dataSource={dataSource} width="100%" />);
-      expect((wrapper.instance() as Scheduler).getCellWidth()).toEqual('12%');
+      expect((wrapper.instance() as Scheduler).getResourceWidth()).toEqual(200);
+    });
+
+    it('this.isResponsive() : it should return true', () => {
+      const wrapper = mount(<Scheduler dataSource={dataSource} width="100%" />);
+      const instance = wrapper.instance() as Scheduler;
+      expect(instance.isResponsive()).toEqual(true);
+    });
+
+    it('this.getCellWidht() : it should return 120.48 @@@ 1004 (Scheduler width) * 12 (12%) / 100 @@@', () => {
+      const wrapper = shallow(<Scheduler dataSource={dataSource} width="100%" />);
+      expect((wrapper.instance() as Scheduler).getCellWidth()).toEqual(120.48);
+    });
+
+    it('this.getTotalCellWidth() : it should return 843.36 @@@ 120.48 * 7 @@@', () => {
+      const wrapper = shallow(<Scheduler dataSource={dataSource} width="100%" />);
+      expect((wrapper.instance() as Scheduler).getTotalCellWidth()).toEqual(843.36);
     });
   });
 });
