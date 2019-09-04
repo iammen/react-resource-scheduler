@@ -13,7 +13,7 @@ import {
 } from './interface';
 import { ViewTypes, CellUnits } from './enum';
 import { DATE_FORMAT, DATETIME_FORMAT } from './config';
-import { isNonWorkingTime } from './_util/isNonWorkingTime';
+import { isWorkingTime } from './_util/isWorkingTime';
 import { getDateLabel } from './_util/getDateLabel';
 
 interface InitProps {
@@ -214,7 +214,7 @@ export class SchedulerDataManger {
     let header = start;
 
     if (this.showAgenda) {
-      this.headers.push({ time: header.format(DATETIME_FORMAT), nonWorkingTime: false });
+      this.headers.push({ time: header.format(DATETIME_FORMAT), workingTime: false });
     } else {
       if (this.cellUnit === CellUnits.Hour) {
         start = start.add(this.config.dayStartFrom, 'hours');
@@ -227,8 +227,8 @@ export class SchedulerDataManger {
             const hour = header.hour();
             if (hour >= this.config.dayStartFrom && hour <= this.config.dayStopTo) {
               const time = header.format(DATETIME_FORMAT);
-              const nonWorkingTime = isNonWorkingTime(time, this.localeMoment, this.cellUnit);
-              this.headers.push({ time, nonWorkingTime });
+              const workingTime = isWorkingTime(time, this.localeMoment, this.cellUnit);
+              this.headers.push({ time, workingTime });
             }
 
             header = header.add(this.config.minuteStep, 'minutes');
@@ -239,8 +239,8 @@ export class SchedulerDataManger {
           const time = header.format(DATETIME_FORMAT);
           const dayOfWeek = header.weekday();
           if (this.config.displayWeekend || (dayOfWeek !== 0 && dayOfWeek !== 6)) {
-            const nonWorkingTime = isNonWorkingTime(time, this.localeMoment, this.cellUnit);
-            this.headers.push({ time, nonWorkingTime });
+            const workingTime = isWorkingTime(time, this.localeMoment, this.cellUnit);
+            this.headers.push({ time, workingTime });
           }
 
           header = header.add(1, 'days');
@@ -578,7 +578,7 @@ export class SchedulerDataManger {
 
     return {
       time: header.time,
-      nonWorkingTime: header.nonWorkingTime,
+      workingTime: header.workingTime,
       start,
       end,
       count: 0,

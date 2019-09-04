@@ -25,7 +25,7 @@ const HeaderView: React.FC<HeaderViewProps> = props => {
           const datetime = localeMoment(item.time);
           const isCurrentTime = datetime.isSame(new Date(), 'hour');
 
-          style = item.nonWorkingTime
+          style = !item.workingTime
             ? {
                 width: width * minuteStepsInHour,
                 color: config.nonWorkingTimeHeadColor,
@@ -34,7 +34,7 @@ const HeaderView: React.FC<HeaderViewProps> = props => {
             : { width: width * minuteStepsInHour };
 
           if (index === headers.length - minuteStepsInHour) {
-            style = !!item.nonWorkingTime
+            style = !item.workingTime
               ? {
                   color: config.nonWorkingTimeHeadColor,
                   backgroundColor: config.nonWorkingTimeHeadBgColor,
@@ -55,7 +55,7 @@ const HeaderView: React.FC<HeaderViewProps> = props => {
     } else {
       headerList = headers.map((item, index) => {
         const datetime = localeMoment(item.time);
-        style = !!item.nonWorkingTime
+        style = !item.workingTime
           ? {
               width,
               color: config.nonWorkingTimeHeadColor,
@@ -63,7 +63,7 @@ const HeaderView: React.FC<HeaderViewProps> = props => {
             }
           : { width };
         if (index === headers.length - 1) {
-          style = !!item.nonWorkingTime
+          style = !item.workingTime
             ? {
                 color: config.nonWorkingTimeHeadColor,
                 backgroundColor: config.nonWorkingTimeHeadBgColor,

@@ -1,5 +1,5 @@
 export interface CellData {
-  nonWorkingTime: boolean;
+  workingTime: boolean;
   time: string;
   start: string;
   end: string;
@@ -104,7 +104,7 @@ export interface SchedulerDataConfig {
 }
 
 export interface SchedulerHeader {
-  nonWorkingTime: boolean;
+  workingTime: boolean;
   time: string;
 }
 
