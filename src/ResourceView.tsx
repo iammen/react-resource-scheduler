@@ -20,7 +20,7 @@ const ResourceView: React.FC<ResourceViewProps> = ({
   if (contextValue.source && contextValue.styles) {
     const paddingBottom = contentScrollbarHeight;
     const renderedSlots = contextValue.source.slots.filter(o => o.render);
-    const resourceList = renderedSlots.map(slot => {
+    const resources = renderedSlots.map(slot => {
       const indents = [];
       for (let i = 0; i < slot.indent; i++) {
         indents.push(<span key={`es${i}`} className="expander-space"></span>);
@@ -67,13 +67,13 @@ const ResourceView: React.FC<ResourceViewProps> = ({
               onSlotClick(slot);
             }}
           >
-            {slot.name}
+            {slot.text}
           </a>
         </span>
       ) : (
         <span className="slot-cell">
           {indents}
-          <span className="slot-text">{slot.name}</span>
+          <span className="slot-text">{slot.text}</span>
         </span>
       );
 
@@ -81,7 +81,7 @@ const ResourceView: React.FC<ResourceViewProps> = ({
         <tr key={slot.id} style={{ height: slot.rowHeight }}>
           <td data-resource-id={slot.id}>
             <div
-              title={slot.name}
+              title={slot.text}
               className="overflow-text header2-text"
               style={{ textAlign: 'left' }}
             >
@@ -95,7 +95,7 @@ const ResourceView: React.FC<ResourceViewProps> = ({
     return (
       <div style={{ paddingBottom }}>
         <table className="resource-table">
-          <tbody>{resourceList}</tbody>
+          <tbody>{resources}</tbody>
         </table>
       </div>
     );

@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import { SchedulerData } from './ScdulerData';
 import { Styles } from './Scheduler';
+import { SchedulerDataManger } from './SchedulerDataManager';
 
 export interface SchedulerDataContext {
-  source: SchedulerData;
+  source: SchedulerDataManger;
   styles: Styles;
 }
 

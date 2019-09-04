@@ -6,7 +6,6 @@ export const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
 export default {
   schedulerWidth: '100%',
-  besidesWidth: 20,
   schedulerMaxHeight: 0,
 
   agendaMaxEventWidth: 100,
@@ -72,11 +71,11 @@ export default {
   minuteStep: 30,
 
   views: [
-    { title: 'Day', viewType: ViewTypes.Day, showAgenda: false, isEventPerspective: false },
-    { title: 'Week', viewType: ViewTypes.Week, showAgenda: false, isEventPerspective: false },
-    { title: 'Month', viewType: ViewTypes.Month, showAgenda: false, isEventPerspective: false },
+    { text: 'Day', viewType: ViewTypes.Day, showAgenda: false, isEventPerspective: false },
+    { text: 'Week', viewType: ViewTypes.Week, showAgenda: false, isEventPerspective: false },
+    { text: 'Month', viewType: ViewTypes.Month, showAgenda: false, isEventPerspective: false },
     {
-      title: 'Quarter',
+      text: 'Quarter',
       viewType: ViewTypes.Quarter,
       showAgenda: false,
       isEventPerspective: false,

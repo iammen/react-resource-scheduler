@@ -1,8 +1,9 @@
-import { SchedulerData } from '../ScdulerData';
+import { SchedulerDataManger } from '../SchedulerDataManager';
 import { ViewTypes } from '../enum';
+import { SchedulerData } from '../ScdulerData';
 
 export const getDateLabel = (
-  schedulerData: SchedulerData,
+  schedulerData: SchedulerData | SchedulerDataManger,
   viewMode: string,
   startDate: string,
   endDate: string,

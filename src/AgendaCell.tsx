@@ -41,7 +41,7 @@ export default class AgendaCell extends Component<AgendaCellProps, {}> {
       const titleText = getEventText(contextValue.source, defaultValue);
       const content = (
         <EventPopover
-          title={defaultValue.title}
+          text={defaultValue.text}
           startTime={defaultValue.start}
           endTime={defaultValue.end}
           statusColor={bgColor}

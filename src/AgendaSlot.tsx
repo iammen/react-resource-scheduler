@@ -49,7 +49,7 @@ export default class AgendaSlot extends Component<AgendaSlotProps, {}> {
       return (
         <tr style={{ minHeight: contextValue.styles.headerHeight || 17 + 2 }}>
           <td data-resource-id={defaultValue.id}>
-            <span>{defaultValue.name}</span>
+            <span>{defaultValue.text}</span>
           </td>
           <td>
             <div className="day-event-container">{cells}</div>

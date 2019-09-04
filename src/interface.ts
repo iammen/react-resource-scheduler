@@ -29,7 +29,7 @@ export interface Event {
   start: string;
   end: string;
   resourceId: string;
-  title: string;
+  text: string;
   bgColor?: string;
   render?: any;
   rrule?: string;
@@ -41,13 +41,13 @@ export interface Event {
 
 export interface EventGroup {
   id: string;
-  name: string;
+  text: string;
   event: Event;
 }
 
 export interface Resource {
   id: string;
-  name: string;
+  text: string;
 }
 
 export interface SchedulerDataConfig {
@@ -110,7 +110,7 @@ export interface SchedulerHeader {
 
 export interface Slot {
   id: number;
-  name: string;
+  text: string;
   parentId?: number;
   groupOnly?: boolean;
   hasSummary: boolean;
@@ -124,7 +124,7 @@ export interface Slot {
 }
 
 export interface View {
-  title?: string;
+  text?: string;
   viewType: string;
   showAgenda: boolean;
   isEventPerspective: boolean;

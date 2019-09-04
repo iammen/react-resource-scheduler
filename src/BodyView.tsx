@@ -3,10 +3,10 @@ import * as PropTypes from 'prop-types';
 import { useSchedulerContext } from './SchedulerContext';
 
 export interface BodyViewProps {
-  cellWidth: number;
+  width: number;
 }
 
-const BodyView: React.FC<BodyViewProps> = ({ cellWidth }) => {
+const BodyView: React.FC<BodyViewProps> = ({ width }) => {
   const contextValue = useSchedulerContext();
 
   if (contextValue.source && contextValue.styles) {
@@ -15,7 +15,7 @@ const BodyView: React.FC<BodyViewProps> = ({ cellWidth }) => {
     const tableRows = renderedSlots.map(slot => {
       const rowCells = headers.map((header, index) => {
         const key = slot.id + '_' + header.time;
-        const style = index === headers.length - 1 ? {} : { width: cellWidth };
+        const style = index === headers.length - 1 ? {} : { width };
         return (
           <td key={key} style={style}>
             <div></div>
@@ -37,7 +37,7 @@ const BodyView: React.FC<BodyViewProps> = ({ cellWidth }) => {
 };
 
 BodyView.propTypes = {
-  cellWidth: PropTypes.number.isRequired,
+  width: PropTypes.number.isRequired,
 };
 
 export default BodyView;

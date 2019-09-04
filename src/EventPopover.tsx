@@ -7,13 +7,13 @@ import { useSchedulerContext } from './SchedulerContext';
 import { DATETIME_FORMAT } from './config';
 
 export interface EventPopoverProps {
-  title: string;
+  text: string;
   startTime: string;
   endTime: string;
   statusColor: string;
 }
 
-const EventPopover: React.FC<EventPopoverProps> = ({ endTime, startTime, statusColor, title }) => {
+const EventPopover: React.FC<EventPopoverProps> = ({ endTime, startTime, statusColor, text }) => {
   const contextValue = useSchedulerContext();
 
   if (contextValue.styles && contextValue.source) {
@@ -69,8 +69,8 @@ const EventPopover: React.FC<EventPopoverProps> = ({ endTime, startTime, statusC
             <div className="status-dot" style={{ backgroundColor: statusColor }} />
           </Col>
           <Col span={22} className="overflow-text">
-            <span className="header2-text" title={title}>
-              {title}
+            <span className="header2-text" title={text}>
+              {text}
             </span>
           </Col>
         </Row>
@@ -104,7 +104,7 @@ const EventPopover: React.FC<EventPopoverProps> = ({ endTime, startTime, statusC
 };
 
 EventPopover.propTypes = {
-  title: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
   startTime: PropTypes.string.isRequired,
   endTime: PropTypes.string.isRequired,
   statusColor: PropTypes.string.isRequired,
