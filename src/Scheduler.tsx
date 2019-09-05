@@ -44,7 +44,8 @@ export interface SchedulerProps {
   displayType: DisplayType;
   dndSources?: [];
   events: Event[];
-  headerFormat: string;
+  dateFormat: string;
+  timeFormat: string;
   leftCustomHeader: React.ReactNode;
   locale: string;
   resources: Resource[];
@@ -111,7 +112,8 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     agendaView: undefined,
     currentDate: moment().format(DATE_FORMAT),
     displayType: 'task',
-    headerFormat: 'ddd M/D',
+    dateFormat: 'ddd M/D',
+    timeFormat: 'ha',
     leftCustomHeader: undefined,
     locale: 'en',
     rightCustomHeader: undefined,
@@ -153,10 +155,11 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     agendaView: PropTypes.node,
     displayType: PropTypes.string,
     dndSources: PropTypes.array,
-    headerFormat: PropTypes.string,
+    dateFormat: PropTypes.string,
     leftCustomHeader: PropTypes.node,
     rightCustomHeader: PropTypes.node,
     styles: PropTypes.object,
+    timeFormat: PropTypes.string,
     viewRender: PropTypes.object,
     viewType: PropTypes.string,
     width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -450,7 +453,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     let height = 0;
     this.dataManger.slots.forEach(slot => {
       if (slot.render) {
-        height += slot.rowHeight;
+        height += slot.height;
       }
     });
 
@@ -691,7 +694,11 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                   onScroll={this.handleHeadScroll}
                 >
                   <HeaderView
-                    format={this.props.headerFormat}
+                    format={
+                      this.props.viewType === ViewTypes.Day
+                        ? this.props.timeFormat
+                        : this.props.dateFormat
+                    }
                     height={this.props.styles.headerHeight}
                     width={cellWidth}
                   />

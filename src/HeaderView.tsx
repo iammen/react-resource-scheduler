@@ -20,42 +20,39 @@ const HeaderView: React.FC<HeaderViewProps> = props => {
     let headerList = [];
     let style = {};
     if (cellUnit === CellUnits.Hour) {
-      headerList = headers.map((item, index) => {
+      headerList = headers.map((header, index) => {
         if (index % minuteStepsInHour === 0) {
-          const datetime = localeMoment(item.time);
+          const datetime = localeMoment(header.time);
           const isCurrentTime = datetime.isSame(new Date(), 'hour');
 
-          style = !item.workingTime
+          style = !header.workingTime
             ? {
                 width: width * minuteStepsInHour,
-                color: config.nonWorkingTimeHeadColor,
-                backgroundColor: config.nonWorkingTimeHeadBgColor,
               }
             : { width: width * minuteStepsInHour };
 
           if (index === headers.length - minuteStepsInHour) {
-            style = !item.workingTime
-              ? {
-                  color: config.nonWorkingTimeHeadColor,
-                  backgroundColor: config.nonWorkingTimeHeadBgColor,
-                }
-              : {};
+            style = {};
           }
 
           const textFormats = format ? format.split('\n').map(f => datetime.format(f)) : [];
           const pList = textFormats.map((str, i) => <div key={i}>{str}</div>);
 
           return (
-            <th key={item.time} className="header3-text" style={style}>
+            <th
+              key={header.time}
+              className={`header-text ${header.workingTime ? 'bg-normal' : 'bg-highlight'}`}
+              style={style}
+            >
               <div>{pList}</div>
             </th>
           );
         }
       });
     } else {
-      headerList = headers.map((item, index) => {
-        const datetime = localeMoment(item.time);
-        style = !item.workingTime
+      headerList = headers.map((header, index) => {
+        const datetime = localeMoment(header.time);
+        style = !header.workingTime
           ? {
               width,
               color: config.nonWorkingTimeHeadColor,
@@ -63,7 +60,7 @@ const HeaderView: React.FC<HeaderViewProps> = props => {
             }
           : { width };
         if (index === headers.length - 1) {
-          style = !item.workingTime
+          style = !header.workingTime
             ? {
                 color: config.nonWorkingTimeHeadColor,
                 backgroundColor: config.nonWorkingTimeHeadBgColor,
@@ -75,7 +72,11 @@ const HeaderView: React.FC<HeaderViewProps> = props => {
         const pList = textFormats.map((txt, i) => <div key={i}>{txt}</div>);
 
         return (
-          <th key={item.time} className="header3-text" style={style}>
+          <th
+            key={header.time}
+            className={`header-text ${header.workingTime ? 'bg-normal' : 'bg-highlight'}`}
+            style={style}
+          >
             <div>{pList}</div>
           </th>
         );
@@ -83,7 +84,7 @@ const HeaderView: React.FC<HeaderViewProps> = props => {
     }
 
     return (
-      <table className="scheduler-bg-table">
+      <table className="scheduler-header-table">
         <thead>
           <tr style={{ height }}>{headerList}</tr>
         </thead>

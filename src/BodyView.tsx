@@ -24,7 +24,7 @@ const BodyView: React.FC<BodyViewProps> = ({ width }) => {
       });
 
       return (
-        <tr key={slot.id} style={{ height: slot.rowHeight }}>
+        <tr key={slot.id} style={{ height: slot.height }}>
           {rowCells}
         </tr>
       );

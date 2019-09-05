@@ -3,7 +3,7 @@ export interface CellData {
   time: string;
   start: string;
   end: string;
-  count: number;
+  eventCount: number;
   addMore: number;
   addMoreIndex: number;
   events: Event[];
@@ -110,17 +110,17 @@ export interface SchedulerHeader {
 
 export interface Slot {
   id: number;
-  text: string;
-  parentId?: number;
-  groupOnly?: boolean;
-  hasSummary: boolean;
-  rowMaxCount: number;
-  rowHeight: number;
   cells: CellData[];
-  indent: number;
-  hasChildren: boolean;
   expanded: boolean;
+  groupOnly?: boolean;
+  hasChildren: boolean;
+  hasSummary: boolean;
+  indent: number;
+  maxEventPerRow: number;
+  parentId?: number;
   render: boolean;
+  height: number;
+  text: string;
 }
 
 export interface View {

@@ -78,6 +78,7 @@ export default class Basic extends React.Component<Props, {}> {
       <div style={{ padding: 10, position: 'relative' }}>
         <h3 style={{ textAlign: 'center' }}>Basic example</h3>
         <Scheduler
+          currentDate="2017-12-18"
           events={DemoData.events}
           resources={DemoData.resources}
           viewType="week"

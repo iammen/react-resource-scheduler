@@ -273,19 +273,19 @@ export class SchedulerData {
           const cellEnd = this.localeMoment(cell.end);
 
           if (cellEnd > eventStart && cellStart < eventEnd) {
-            cell.count = (cell.count || 0) + 1;
-            if (cell.count > slot.rowMaxCount) {
-              slot.rowMaxCount = cell.count;
+            cell.eventCount = (cell.eventCount || 0) + 1;
+            if (cell.eventCount > slot.maxEventPerRow) {
+              slot.maxEventPerRow = cell.eventCount;
               const rowsCount =
                 cellMaxEventsCount <= cellMaxEventsCountValue &&
-                slot.rowMaxCount > cellMaxEventsCount
+                slot.maxEventPerRow > cellMaxEventsCount
                   ? cellMaxEventsCount
-                  : slot.rowMaxCount;
+                  : slot.maxEventPerRow;
               const newRowHeight =
                 rowsCount * this.config.eventItemLineHeight +
                 (this.config.creatable && this.config.checkConflict === false ? 20 : 2);
-              if (newRowHeight > slot.rowHeight) {
-                slot.rowHeight = newRowHeight;
+              if (newRowHeight > slot.height) {
+                slot.height = newRowHeight;
               }
             }
 
@@ -341,13 +341,13 @@ export class SchedulerData {
             }
 
             if (cell.events[index] !== undefined) {
-              if (renderItemsCount + 1 < cell.count) {
-                cell.addMore = cell.count - renderItemsCount;
+              if (renderItemsCount + 1 < cell.eventCount) {
+                cell.addMore = cell.eventCount - renderItemsCount;
                 cell.addMoreIndex = addMoreIndex;
               }
             } else {
-              if (renderItemsCount < cell.count) {
-                cell.addMore = cell.count - renderItemsCount;
+              if (renderItemsCount < cell.eventCount) {
+                cell.addMore = cell.eventCount - renderItemsCount;
                 cell.addMoreIndex = addMoreIndex;
               }
             }
@@ -381,14 +381,15 @@ export class SchedulerData {
         slot.hasSummary = hasSummary;
         if (hasSummary) {
           const rowsCount =
-            cellMaxEventsCount <= cellMaxEventsCountValue && slot.rowMaxCount > cellMaxEventsCount
+            cellMaxEventsCount <= cellMaxEventsCountValue &&
+            slot.maxEventPerRow > cellMaxEventsCount
               ? cellMaxEventsCount
-              : slot.rowMaxCount;
+              : slot.maxEventPerRow;
           const newRowHeight =
             (rowsCount + 1) * this.config.eventItemLineHeight +
             (this.config.creatable && this.config.checkConflict === false ? 20 : 2);
-          if (newRowHeight > slot.rowHeight) {
-            slot.rowHeight = newRowHeight;
+          if (newRowHeight > slot.height) {
+            slot.height = newRowHeight;
           }
         }
       });
@@ -582,7 +583,7 @@ export class SchedulerData {
       workingTime: header.workingTime,
       start,
       end,
-      count: 0,
+      eventCount: 0,
       addMore: 0,
       addMoreIndex: 0,
       events: [], // [, , ,],
@@ -611,8 +612,8 @@ export class SchedulerData {
         parentId: slot.parentId,
         groupOnly: slot.groupOnly,
         hasSummary: false,
-        rowMaxCount: 0,
-        rowHeight:
+        maxEventPerRow: 0,
+        height:
           this.config.nonAgendaSlotMinHeight !== 0
             ? this.config.nonAgendaSlotMinHeight
             : this.config.eventItemLineHeight + 2,

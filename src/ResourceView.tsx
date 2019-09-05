@@ -78,7 +78,7 @@ const ResourceView: React.FC<ResourceViewProps> = ({
       );
 
       return (
-        <tr key={slot.id} style={{ height: slot.rowHeight }}>
+        <tr key={slot.id} style={{ height: slot.height }}>
           <td data-resource-id={slot.id}>
             <div
               title={slot.text}

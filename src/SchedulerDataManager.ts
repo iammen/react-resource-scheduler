@@ -18,13 +18,14 @@ import { getDateLabel } from './_util/getDateLabel';
 
 interface InitProps {
   currentDate: string;
-  language: string;
-  viewType: string;
   events: Event[];
+  isEventPerspective: boolean;
+  language: string;
+  minuteStep: number;
+  newConfig?: any;
   resources: Resource[];
   showAgenda: boolean;
-  isEventPerspective: boolean;
-  newConfig?: any;
+  viewType: string;
   customFunc?: CustomSchedulerFunc;
 }
 
@@ -64,6 +65,20 @@ export class SchedulerDataManger {
    */
   public viewType: string;
 
+  // Default value is 23.
+  private endTimeOfDay: number;
+
+  // Default value is 0.
+  private startTimeOfDay: number;
+
+  private minuteStep: number;
+
+  // Minimum height per slot.
+  private slotMinHeight: number;
+
+  // Line height of an event.
+  private eventLineHeight: number;
+
   constructor(args: Partial<InitProps>) {
     this.resources = args.resources || [];
     this.events = args.events || [];
@@ -74,6 +89,7 @@ export class SchedulerDataManger {
     this.viewType = args.viewType || ViewTypes.Week;
     this.cellUnit =
       args.viewType && args.viewType === ViewTypes.Day ? CellUnits.Hour : CellUnits.Day;
+    this.config = config;
     this.showAgenda = args.showAgenda || false;
     this.isEventPerspective = args.isEventPerspective || false;
     this.resizing = false;
@@ -81,8 +97,13 @@ export class SchedulerDataManger {
     this.language = args.language || 'en';
     this.localeMoment = moment;
 
-    this.config = !args.newConfig ? config : { ...config, ...args.newConfig };
-    this.validateMinuteStep(this.config.minuteStep);
+    this.startTimeOfDay = 0;
+    this.endTimeOfDay = 23;
+    this.minuteStep = args.minuteStep || 30;
+    this.slotMinHeight = 24;
+    this.eventLineHeight = 24;
+
+    this.validateMinuteStep(this.minuteStep);
     this.customFunc = args.customFunc || undefined;
     this.resolveDateRange(0, args.currentDate || moment().format(DATE_FORMAT));
     this.createHeaders();
@@ -120,7 +141,7 @@ export class SchedulerDataManger {
   }
 
   public getMinuteStepsInHour() {
-    return 60 / this.config.minuteStep;
+    return 60 / this.minuteStep;
   }
 
   public getScrollToSpecialMoment() {
@@ -164,9 +185,9 @@ export class SchedulerDataManger {
   }
 
   public setMinuteStep(minuteStep: number) {
-    if (this.config.minuteStep !== minuteStep) {
+    if (this.minuteStep !== minuteStep) {
       this.validateMinuteStep(minuteStep);
-      this.config.minuteStep = minuteStep;
+      this.minuteStep = minuteStep;
       this.createHeaders();
       this.createSlots();
     }
@@ -217,21 +238,21 @@ export class SchedulerDataManger {
       this.headers.push({ time: header.format(DATETIME_FORMAT), workingTime: false });
     } else {
       if (this.cellUnit === CellUnits.Hour) {
-        start = start.add(this.config.dayStartFrom, 'hours');
-        end = end.add(this.config.dayStopTo, 'hours');
+        start = start.add(this.startTimeOfDay, 'hours');
+        end = end.add(this.endTimeOfDay, 'hours');
         header = start;
 
         while (header >= start && header <= end) {
           const minuteSteps = this.getMinuteStepsInHour();
           for (let i = 0; i < minuteSteps; i++) {
             const hour = header.hour();
-            if (hour >= this.config.dayStartFrom && hour <= this.config.dayStopTo) {
+            if (hour >= this.startTimeOfDay && hour <= this.endTimeOfDay) {
               const time = header.format(DATETIME_FORMAT);
               const workingTime = isWorkingTime(time, this.localeMoment, this.cellUnit);
               this.headers.push({ time, workingTime });
             }
 
-            header = header.add(this.config.minuteStep, 'minutes');
+            header = header.add(this.minuteStep, 'minutes');
           }
         }
       } else {
@@ -252,7 +273,6 @@ export class SchedulerDataManger {
   private createSlots() {
     // Initialize slot data.
     this.slots = this.initializeSlot();
-    console.log(this.slots);
     const cellMaxEventsCount = this.getCellMaxEvents();
     const cellMaxEventsCountValue = 30;
 
@@ -272,22 +292,23 @@ export class SchedulerDataManger {
           const cellEnd = this.localeMoment(cell.end);
 
           if (cellEnd > eventStart && cellStart < eventEnd) {
-            cell.count = (cell.count || 0) + 1;
-            if (cell.count > slot.rowMaxCount) {
-              slot.rowMaxCount = cell.count;
+            cell.eventCount += 1;
+            if (cell.eventCount > slot.maxEventPerRow) {
+              slot.maxEventPerRow = cell.eventCount;
               const rowsCount =
                 cellMaxEventsCount <= cellMaxEventsCountValue &&
-                slot.rowMaxCount > cellMaxEventsCount
+                slot.maxEventPerRow > cellMaxEventsCount
                   ? cellMaxEventsCount
-                  : slot.rowMaxCount;
-              const newRowHeight =
-                rowsCount * this.config.eventItemLineHeight +
-                (this.config.creatable && this.config.checkConflict === false ? 20 : 2);
-              if (newRowHeight > slot.rowHeight) {
-                slot.rowHeight = newRowHeight;
+                  : slot.maxEventPerRow;
+              const height =
+                rowsCount * this.eventLineHeight +
+                (this.config.creatable && !this.config.checkConflict ? 20 : 2);
+              if (height > slot.height) {
+                slot.height = height;
               }
             }
 
+            // Do this section only once.
             if (indx === -1) {
               let tmp = 0;
               if (cell.events) {
@@ -340,13 +361,13 @@ export class SchedulerDataManger {
             }
 
             if (cell.events[index] !== undefined) {
-              if (renderItemsCount + 1 < cell.count) {
-                cell.addMore = cell.count - renderItemsCount;
+              if (renderItemsCount + 1 < cell.eventCount) {
+                cell.addMore = cell.eventCount - renderItemsCount;
                 cell.addMoreIndex = addMoreIndex;
               }
             } else {
-              if (renderItemsCount < cell.count) {
-                cell.addMore = cell.count - renderItemsCount;
+              if (renderItemsCount < cell.eventCount) {
+                cell.addMore = cell.eventCount - renderItemsCount;
                 cell.addMoreIndex = addMoreIndex;
               }
             }
@@ -380,14 +401,15 @@ export class SchedulerDataManger {
         slot.hasSummary = hasSummary;
         if (hasSummary) {
           const rowsCount =
-            cellMaxEventsCount <= cellMaxEventsCountValue && slot.rowMaxCount > cellMaxEventsCount
+            cellMaxEventsCount <= cellMaxEventsCountValue &&
+            slot.maxEventPerRow > cellMaxEventsCount
               ? cellMaxEventsCount
-              : slot.rowMaxCount;
+              : slot.maxEventPerRow;
           const newRowHeight =
-            (rowsCount + 1) * this.config.eventItemLineHeight +
+            (rowsCount + 1) * this.eventLineHeight +
             (this.config.creatable && this.config.checkConflict === false ? 20 : 2);
-          if (newRowHeight > slot.rowHeight) {
-            slot.rowHeight = newRowHeight;
+          if (newRowHeight > slot.height) {
+            slot.height = newRowHeight;
           }
         }
       });
@@ -467,7 +489,7 @@ export class SchedulerDataManger {
       const spanStart = this.localeMoment(header.time);
       const spanEnd =
         this.cellUnit === CellUnits.Hour
-          ? this.localeMoment(header.time).add(this.config.minuteStep, 'minutes')
+          ? this.localeMoment(header.time).add(this.minuteStep, 'minutes')
           : this.localeMoment(header.time).add(1, 'days');
 
       if (spanStart < end && spanEnd > start) {
@@ -573,7 +595,7 @@ export class SchedulerDataManger {
             .add(1, 'days')
             .format(DATETIME_FORMAT)
       : this.cellUnit === CellUnits.Hour
-      ? startDt.add(this.config.minuteStep, 'minutes').format(DATETIME_FORMAT)
+      ? startDt.add(this.minuteStep, 'minutes').format(DATETIME_FORMAT)
       : startDt.add(1, 'days').format(DATETIME_FORMAT);
 
     return {
@@ -581,10 +603,10 @@ export class SchedulerDataManger {
       workingTime: header.workingTime,
       start,
       end,
-      count: 0,
+      eventCount: 0,
       addMore: 0,
       addMoreIndex: 0,
-      events: [], // [, , ,],
+      events: [],
     } as CellData;
   }
 
@@ -605,11 +627,8 @@ export class SchedulerDataManger {
         parentId: slot.parentId,
         groupOnly: slot.groupOnly,
         hasSummary: false,
-        rowMaxCount: 0,
-        rowHeight:
-          this.config.nonAgendaSlotMinHeight !== 0
-            ? this.config.nonAgendaSlotMinHeight
-            : this.config.eventItemLineHeight + 2,
+        maxEventPerRow: 0,
+        height: this.slotMinHeight !== 0 ? this.slotMinHeight : this.eventLineHeight + 2,
         cells,
         indent: 0,
         hasChildren: false,
