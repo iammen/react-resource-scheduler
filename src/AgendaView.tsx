@@ -14,25 +14,23 @@ const AgendaView: React.FC<AgendaViewProps> = props => {
 
   if (contextValue.styles && contextValue.source) {
     return (
-      <tr>
-        <td>
-          <table className="scheduler-table">
-            <thead>
-              <tr style={{ height: contextValue.styles.headerHeight }}>
-                <th style={{ width: contextValue.styles.slotHeaderWidth }} className="header3-text">
-                  {props.resourceTitle}
-                </th>
-                <th className="header3-text">{props.agendaTitle}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contextValue.source.slots.map(slot => (
-                <AgendaSlot defaultValue={slot} key={slot.id} />
-              ))}
-            </tbody>
-          </table>
-        </td>
-      </tr>
+      <div>
+        <table className="scheduler-table">
+          <thead>
+            <tr style={{ height: contextValue.styles.headerHeight }}>
+              <th style={{ width: contextValue.styles.slotHeaderWidth }} className="header3-text">
+                {props.resourceTitle}
+              </th>
+              <th className="header-text">{props.agendaTitle}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {contextValue.source.slots.map(slot => (
+              <AgendaSlot defaultValue={slot} key={slot.id} />
+            ))}
+          </tbody>
+        </table>
+      </div>
     );
   } else {
     return null;

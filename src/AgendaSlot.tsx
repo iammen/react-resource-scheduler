@@ -31,7 +31,7 @@ export default class AgendaSlot extends Component<AgendaSlotProps, {}> {
         const headerEnd = localeMoment(cell.end).format(DATE_FORMAT);
 
         if (start === headerStart && end === headerEnd) {
-          cell.events.forEach(event => {
+          cell.renderedEvents.forEach(event => {
             const durationStart = localeMoment(startDate);
             const durationEnd = localeMoment(endDate).add(1, 'days');
             const eventStart = localeMoment(event.start);

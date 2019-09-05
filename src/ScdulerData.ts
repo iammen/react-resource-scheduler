@@ -2,7 +2,7 @@ import moment from 'moment';
 import { rrulestr } from 'rrule';
 import config from './config';
 import {
-  CellData,
+  Cell,
   CustomSchedulerDate,
   Event,
   EventGroup,
@@ -274,13 +274,13 @@ export class SchedulerData {
 
           if (cellEnd > eventStart && cellStart < eventEnd) {
             cell.eventCount = (cell.eventCount || 0) + 1;
-            if (cell.eventCount > slot.maxEventPerRow) {
-              slot.maxEventPerRow = cell.eventCount;
+            if (cell.eventCount > slot.eventsInRow) {
+              slot.eventsInRow = cell.eventCount;
               const rowsCount =
                 cellMaxEventsCount <= cellMaxEventsCountValue &&
-                slot.maxEventPerRow > cellMaxEventsCount
+                slot.eventsInRow > cellMaxEventsCount
                   ? cellMaxEventsCount
-                  : slot.maxEventPerRow;
+                  : slot.eventsInRow;
               const newRowHeight =
                 rowsCount * this.config.eventItemLineHeight +
                 (this.config.creatable && this.config.checkConflict === false ? 20 : 2);
@@ -291,8 +291,8 @@ export class SchedulerData {
 
             if (indx === -1) {
               let tmp = 0;
-              if (cell.events) {
-                while (cell.events[tmp] !== undefined) {
+              if (cell.renderedEvents) {
+                while (cell.renderedEvents[tmp] !== undefined) {
                   tmp++;
                 }
               }
@@ -310,8 +310,8 @@ export class SchedulerData {
               }
             }
 
-            if (cell.events) {
-              // cell.events[indx] = this.createEvent(render, span, event);
+            if (cell.renderedEvents) {
+              // cell.renderedEvents[indx] = this.createEvent(render, span, event);
             }
           }
         });
@@ -332,7 +332,7 @@ export class SchedulerData {
             let addMoreIndex = 0;
             let index = 0;
             while (index < cellMaxEventsCount - 1) {
-              if (cell.events[index] !== undefined) {
+              if (cell.renderedEvents[index] !== undefined) {
                 renderItemsCount++;
                 addMoreIndex = index + 1;
               }
@@ -340,7 +340,7 @@ export class SchedulerData {
               index++;
             }
 
-            if (cell.events[index] !== undefined) {
+            if (cell.renderedEvents[index] !== undefined) {
               if (renderItemsCount + 1 < cell.eventCount) {
                 cell.addMore = cell.eventCount - renderItemsCount;
                 cell.addMoreIndex = addMoreIndex;
@@ -355,7 +355,7 @@ export class SchedulerData {
 
           if (this.customFunc && this.customFunc.getSummary) {
             /* const events: Event[] = [];
-            cell.events.forEach(event => {
+            cell.renderedEvents.forEach(event => {
               if (!!event && !!event.eventItem) {
                 events.push(event.eventItem);
               }
@@ -381,10 +381,9 @@ export class SchedulerData {
         slot.hasSummary = hasSummary;
         if (hasSummary) {
           const rowsCount =
-            cellMaxEventsCount <= cellMaxEventsCountValue &&
-            slot.maxEventPerRow > cellMaxEventsCount
+            cellMaxEventsCount <= cellMaxEventsCountValue && slot.eventsInRow > cellMaxEventsCount
               ? cellMaxEventsCount
-              : slot.maxEventPerRow;
+              : slot.eventsInRow;
           const newRowHeight =
             (rowsCount + 1) * this.config.eventItemLineHeight +
             (this.config.creatable && this.config.checkConflict === false ? 20 : 2);
@@ -557,7 +556,7 @@ export class SchedulerData {
     });
   }
 
-  private initializeCellData(header: SchedulerHeader) {
+  private initializeCell(header: SchedulerHeader) {
     const startDt = this.localeMoment(header.time);
     const start = startDt.format(DATETIME_FORMAT);
     const end = this.showAgenda
@@ -586,8 +585,8 @@ export class SchedulerData {
       eventCount: 0,
       addMore: 0,
       addMoreIndex: 0,
-      events: [], // [, , ,],
-    } as CellData;
+      renderedEvents: [], // [, , ,],
+    } as Cell;
   }
 
   private initializeSlot(
@@ -603,7 +602,7 @@ export class SchedulerData {
     // Loop through each resource.
     slots.forEach(slot => {
       const cells = headers.map(header => {
-        return this.initializeCellData(header);
+        return this.initializeCell(header);
       });
 
       const data: Slot = {
@@ -612,7 +611,7 @@ export class SchedulerData {
         parentId: slot.parentId,
         groupOnly: slot.groupOnly,
         hasSummary: false,
-        maxEventPerRow: 0,
+        eventsInRow: 0,
         height:
           this.config.nonAgendaSlotMinHeight !== 0
             ? this.config.nonAgendaSlotMinHeight

@@ -2,7 +2,7 @@ import moment from 'moment';
 import { rrulestr } from 'rrule';
 import config from './config';
 import {
-  CellData,
+  Cell,
   CustomSchedulerDate,
   Event,
   EventGroup,
@@ -77,7 +77,7 @@ export class SchedulerDataManger {
   private slotMinHeight: number;
 
   // Line height of an event.
-  private eventLineHeight: number;
+  private eventHeight: number;
 
   constructor(args: Partial<InitProps>) {
     this.resources = args.resources || [];
@@ -101,7 +101,7 @@ export class SchedulerDataManger {
     this.endTimeOfDay = 23;
     this.minuteStep = args.minuteStep || 30;
     this.slotMinHeight = 24;
-    this.eventLineHeight = 24;
+    this.eventHeight = 24;
 
     this.validateMinuteStep(this.minuteStep);
     this.customFunc = args.customFunc || undefined;
@@ -273,156 +273,61 @@ export class SchedulerDataManger {
   private createSlots() {
     // Initialize slot data.
     this.slots = this.initializeSlot();
-    const cellMaxEventsCount = this.getCellMaxEvents();
-    const cellMaxEventsCountValue = 30;
 
-    // Loop throught events.
+    // Loop through all events.
     this.events.forEach(event => {
-      const slots = this.slots.filter(s => s.id.toString() === this.getEventSlotId(event));
+      // Find the slot that matches an event.
+      const slots = this.slots.filter(s => s.id.toString() === this.getEventResourceId(event));
 
       if (slots.length > 0) {
+        // Get the first slot only.
         const slot = slots[0];
-        // const span = this.getSpan(event.start, event.end);
+        const span = this.getSpan(event.start, event.end);
         const eventStart = this.localeMoment(event.start);
         const eventEnd = this.localeMoment(event.end);
-        let indx = -1;
+        let orderIndx = -1;
 
+        // Loop through all cells of matched slot.
         slot.cells.forEach((cell, index) => {
           const cellStart = this.localeMoment(cell.start);
           const cellEnd = this.localeMoment(cell.end);
 
+          // If the event start and end in the cell range.
           if (cellEnd > eventStart && cellStart < eventEnd) {
             cell.eventCount += 1;
-            if (cell.eventCount > slot.maxEventPerRow) {
-              slot.maxEventPerRow = cell.eventCount;
-              const rowsCount =
-                cellMaxEventsCount <= cellMaxEventsCountValue &&
-                slot.maxEventPerRow > cellMaxEventsCount
-                  ? cellMaxEventsCount
-                  : slot.maxEventPerRow;
+
+            // Re-calculate slot height.
+            if (cell.eventCount > slot.eventsInRow) {
+              slot.eventsInRow = cell.eventCount;
               const height =
-                rowsCount * this.eventLineHeight +
+                cell.eventCount * this.eventHeight +
                 (this.config.creatable && !this.config.checkConflict ? 20 : 2);
               if (height > slot.height) {
                 slot.height = height;
               }
             }
 
-            // Do this section only once.
-            if (indx === -1) {
-              let tmp = 0;
-              if (cell.events) {
-                while (cell.events[tmp] !== undefined) {
-                  tmp++;
-                }
-              }
-
-              indx = tmp;
+            // Define the order index for an event.
+            if (orderIndx === -1) {
+              orderIndx = cell.renderedEvents.length;
             }
 
-            let render = cellStart <= eventStart || index === 0;
-            if (render === false) {
-              const previousHeader = slot.cells[index - 1];
-              const previousHeaderStart = this.localeMoment(previousHeader.start);
-              const previousHeaderEnd = this.localeMoment(previousHeader.end);
-              if (previousHeaderEnd <= eventStart || previousHeaderStart >= eventEnd) {
+            let render = true;
+            if (cellStart <= eventStart && index > 0) {
+              const previousCell = slot.cells[index - 1];
+              const previousCellStart = this.localeMoment(previousCell.start);
+              const previousCellEnd = this.localeMoment(previousCell.end);
+              if (previousCellEnd <= eventStart || previousCellStart >= eventEnd) {
                 render = true;
               }
             }
 
-            if (cell.events) {
-              // cell.events[indx] = this.createEvent(render, span, event);
-            }
+            cell.renderedEvents[orderIndx] = { ...event, render, span };
           }
         });
       }
     });
-
-    if (
-      cellMaxEventsCount <=
-      cellMaxEventsCountValue /*||
-      this.customFunc && this.customFunc.getSummaryFunc !== undefined*/
-    ) {
-      this.slots.forEach(slot => {
-        const hasSummary = false;
-
-        slot.cells.forEach(cell => {
-          if (cellMaxEventsCount <= cellMaxEventsCountValue) {
-            let renderItemsCount = 0;
-            let addMoreIndex = 0;
-            let index = 0;
-            while (index < cellMaxEventsCount - 1) {
-              if (cell.events[index] !== undefined) {
-                renderItemsCount++;
-                addMoreIndex = index + 1;
-              }
-
-              index++;
-            }
-
-            if (cell.events[index] !== undefined) {
-              if (renderItemsCount + 1 < cell.eventCount) {
-                cell.addMore = cell.eventCount - renderItemsCount;
-                cell.addMoreIndex = addMoreIndex;
-              }
-            } else {
-              if (renderItemsCount < cell.eventCount) {
-                cell.addMore = cell.eventCount - renderItemsCount;
-                cell.addMoreIndex = addMoreIndex;
-              }
-            }
-          }
-
-          if (this.customFunc && this.customFunc.getSummary) {
-            /* const events: Event[] = [];
-            cell.events.forEach(event => {
-              if (!!event && !!event.eventItem) {
-                events.push(event.eventItem);
-              }
-            });
-
-            if (this.customFunc && this.customFunc.getSummary) {
-              cell.summary = this.customFunc.getSummary(
-                this,
-                events,
-                resourceEvents.id,
-                resourceEvents.text,
-                cell.start,
-                cell.end,
-              );
-            }
-            
-            if (!!cell.summary && cell.summary.text) {
-              hasSummary = true;
-            } */
-          }
-        });
-
-        slot.hasSummary = hasSummary;
-        if (hasSummary) {
-          const rowsCount =
-            cellMaxEventsCount <= cellMaxEventsCountValue &&
-            slot.maxEventPerRow > cellMaxEventsCount
-              ? cellMaxEventsCount
-              : slot.maxEventPerRow;
-          const newRowHeight =
-            (rowsCount + 1) * this.eventLineHeight +
-            (this.config.creatable && this.config.checkConflict === false ? 20 : 2);
-          if (newRowHeight > slot.height) {
-            slot.height = newRowHeight;
-          }
-        }
-      });
-    }
   }
-
-  /* private createEvent(render: any, span: any, event: Event) {
-    return {
-      render,
-      span,
-      event,
-    };
-  } */
 
   private detachEvent(event: Event) {
     const index = this.events.indexOf(event);
@@ -464,7 +369,7 @@ export class SchedulerDataManger {
       : this.config.customMaxEvents;
   }
 
-  private getEventSlotId(event: Event) {
+  private getEventResourceId(event: Event) {
     return this.isEventPerspective ? this.getEventGroupId(event) : event.resourceId;
   }
 
@@ -577,7 +482,7 @@ export class SchedulerDataManger {
     });
   }
 
-  private initializeCellData(header: SchedulerHeader) {
+  private initializeCell(header: SchedulerHeader) {
     const startDt = this.localeMoment(header.time);
     const start = startDt.format(DATETIME_FORMAT);
     const end = this.showAgenda
@@ -606,8 +511,8 @@ export class SchedulerDataManger {
       eventCount: 0,
       addMore: 0,
       addMoreIndex: 0,
-      events: [],
-    } as CellData;
+      renderedEvents: [],
+    } as Cell;
   }
 
   private initializeSlot() {
@@ -618,7 +523,7 @@ export class SchedulerDataManger {
     // Loop through each resource.
     slots.forEach(slot => {
       const cells = this.headers.map(header => {
-        return this.initializeCellData(header);
+        return this.initializeCell(header);
       });
 
       const data: Slot = {
@@ -627,8 +532,8 @@ export class SchedulerDataManger {
         parentId: slot.parentId,
         groupOnly: slot.groupOnly,
         hasSummary: false,
-        maxEventPerRow: 0,
-        height: this.slotMinHeight !== 0 ? this.slotMinHeight : this.eventLineHeight + 2,
+        eventsInRow: 0,
+        height: this.slotMinHeight !== 0 ? this.slotMinHeight : this.eventHeight + 2,
         cells,
         indent: 0,
         hasChildren: false,

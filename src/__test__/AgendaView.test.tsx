@@ -1,10 +1,10 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import AgendaView from '../AgendaView';
-import { SchedulerData } from '../ScdulerData';
 import { ViewTypes } from '../enum';
 import DemoData from './DemoData';
 import * as AppContext from '../SchedulerContext';
+import { SchedulerDataManger } from '../SchedulerDataManager';
 
 describe('<AgendaView />', () => {
   const styles = {
@@ -16,10 +16,13 @@ describe('<AgendaView />', () => {
   };
 
   it('it should mock with context', () => {
-    const schedulerData = new SchedulerData('2017-12-08', ViewTypes.Week);
-    schedulerData.localeMoment.locale('th');
-    schedulerData.setResources(DemoData.resources);
-    schedulerData.setEvents(DemoData.events);
+    const schedulerData = new SchedulerDataManger({
+      currentDate: '2017-12-18',
+      viewType: ViewTypes.Week,
+      resources: DemoData.resources,
+      events: DemoData.events,
+      language: 'th',
+    });
     const contextValue = {
       source: schedulerData,
       styles,

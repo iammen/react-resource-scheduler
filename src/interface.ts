@@ -1,4 +1,4 @@
-export interface CellData {
+export interface Cell {
   workingTime: boolean;
   time: string;
   start: string;
@@ -6,7 +6,7 @@ export interface CellData {
   eventCount: number;
   addMore: number;
   addMoreIndex: number;
-  events: Event[];
+  renderedEvents: RenderedEvent[];
   text?: string;
 }
 
@@ -31,18 +31,33 @@ export interface Event {
   resourceId: string;
   text: string;
   bgColor?: string;
-  render?: any;
   rrule?: string;
   recurringEventId?: number | string;
   recurringEventStart?: string;
   recurringEventEnd?: string;
-  span?: any;
 }
 
 export interface EventGroup {
   id: string;
   text: string;
   event: Event;
+}
+
+export interface RenderedEvent {
+  id: number | string;
+  groupId: number;
+  groupName: string;
+  start: string;
+  end: string;
+  resourceId: string;
+  text: string;
+  bgColor?: string;
+  render?: boolean;
+  rrule?: string;
+  recurringEventId?: number | string;
+  recurringEventStart?: string;
+  recurringEventEnd?: string;
+  span?: number;
 }
 
 export interface Resource {
@@ -110,13 +125,13 @@ export interface SchedulerHeader {
 
 export interface Slot {
   id: number;
-  cells: CellData[];
+  cells: Cell[];
   expanded: boolean;
   groupOnly?: boolean;
   hasChildren: boolean;
   hasSummary: boolean;
   indent: number;
-  maxEventPerRow: number;
+  eventsInRow: number;
   parentId?: number;
   render: boolean;
   height: number;
