@@ -3,6 +3,18 @@ import { SchedulerDataConfig, View } from './interface';
 
 export const DATE_FORMAT = 'YYYY-MM-DD';
 export const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+export const DEFAULT_VIEW_TYPES = [
+  { text: 'Day', viewType: ViewTypes.Day, showAgenda: false, isEventPerspective: false },
+  { text: 'Week', viewType: ViewTypes.Week, showAgenda: false, isEventPerspective: false },
+  { text: 'Month', viewType: ViewTypes.Month, showAgenda: false, isEventPerspective: false },
+  {
+    text: 'Quarter',
+    viewType: ViewTypes.Quarter,
+    showAgenda: false,
+    isEventPerspective: false,
+  },
+  { text: 'Year', viewType: ViewTypes.Year, showAgenda: false, isEventPerspective: false },
+] as View[];
 
 export default {
   schedulerWidth: '100%',
@@ -80,6 +92,6 @@ export default {
       showAgenda: false,
       isEventPerspective: false,
     },
-    { viewName: 'Year', viewType: ViewTypes.Year, showAgenda: false, isEventPerspective: false },
+    { text: 'Year', viewType: ViewTypes.Year, showAgenda: false, isEventPerspective: false },
   ] as View[],
 } as SchedulerDataConfig;

@@ -81,7 +81,7 @@ export default class Basic extends React.Component<Props, {}> {
           currentDate="2017-12-18"
           events={DemoData.events}
           resources={DemoData.resources}
-          viewType="day"
+          viewType="week"
           onSelectDate={this.onSelectDate}
           onScrollLeft={this.onScrollLeft}
           onScrollRight={this.onScrollRight}

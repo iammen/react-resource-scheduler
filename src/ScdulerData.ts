@@ -738,23 +738,6 @@ export class SchedulerData {
       this.endDate = this.localeMoment(this.startDate)
         .endOf('year')
         .format(DATE_FORMAT);
-    } else if (
-      this.viewType === ViewTypes.Custom1 ||
-      this.viewType === ViewTypes.Custom2 ||
-      this.viewType === ViewTypes.Custom3
-    ) {
-      if (this.customFunc && this.customFunc.getCustomSchedulerDate) {
-        const customDate = this.customFunc.getCustomSchedulerDate(this, num, date);
-        this.startDate = customDate.startDate;
-        this.endDate = customDate.endDate;
-        if (!!customDate.cellUnit) {
-          this.cellUnit = customDate.cellUnit;
-        }
-      } else {
-        throw new Error(
-          'This is custom view type, set behaviors.getCustomSchedulerDateFunc func to resolve the time window(startDate and endDate) yourself',
-        );
-      }
     }
   }
 

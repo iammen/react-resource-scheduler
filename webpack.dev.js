@@ -14,6 +14,14 @@ module.exports = {
     publicPath: 'http://localhost:8080/example/',
   },
 
+  // https://webpack.js.org/configuration/dev-server
+  devServer: {
+    open: true,
+    openPage: 'example',
+    liveReload: true,
+    port: 9090,
+  },
+
   // Enable sourcemaps for debugging Webpack's output.
   devtool: 'source-map',
 

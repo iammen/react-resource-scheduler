@@ -11,6 +11,7 @@ import BodyView from './BodyView';
 import HeaderView from './HeaderView';
 import ResourceView from './ResourceView';
 import AgendaView from './AgendaView';
+import { ViewSelector } from './ViewSelector';
 
 import 'antd/lib/select/style/index.css';
 import 'antd/lib/grid/style/index.css';
@@ -19,7 +20,6 @@ import 'antd/lib/popover/style/index.css';
 import 'antd/lib/calendar/style/index.css';
 import './less/style.less';
 
-import { SchedulerData } from './ScdulerData';
 import { SchedulerContext } from './SchedulerContext';
 import { getScrollSpecialMoment } from './_util/getScrollSpecialMoment';
 import { Event, ViewRender, Resource } from './interface';
@@ -417,13 +417,14 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   };
 
   handleViewChange = (e: RadioChangeEvent) => {
-    const args = e.target.value.split(':');
-    const viewType = args[0];
-    const showAgenda = args[1] === DisplayTypes.Agenda;
-    const isEventPerspective = args[2] === '1';
+    const viewType = e.target.value;
 
     if (this.props.onViewChange) {
-      this.props.onViewChange(this.dataManger, { viewType, showAgenda, isEventPerspective });
+      this.props.onViewChange(this.dataManger, {
+        viewType,
+        showAgenda: this.props.displayType,
+        isEventPerspective: false,
+      });
     }
   };
 
@@ -572,21 +573,9 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   }
 
   render() {
-    const { slots, viewType, isEventPerspective, config } = this.dataManger;
+    const { config } = this.dataManger;
     const calendarPopoverEnabled = config.calendarPopoverEnabled;
-
     const dateLabel = this.dataManger.getDateLabel();
-    const defaultValue = `${viewType}${this.props.displayType}${isEventPerspective ? 1 : 0}`;
-    const viewButtons = config.views.map(item => {
-      return (
-        <Radio.Button
-          key={`${item.viewType}${this.props.displayType}${item.isEventPerspective ? 1 : 0}`}
-          value={`${item.viewType}${this.props.displayType}${item.isEventPerspective ? 1 : 0}`}
-        >
-          <span style={{ margin: '0px 8px' }}>{item.text}</span>
-        </Radio.Button>
-      );
-    });
 
     let schedulerBody: JSX.Element;
     if (this.props.displayType === DisplayTypes.Agenda) {
@@ -596,8 +585,8 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
       // const DndResourceEvents = this.state.dndContext.getDropTarget();
       // const eventDndSource = this.state.dndContext.getDndSource();
 
-      const displayRenderData = slots.filter(o => o.render);
-      /* const resourceEventsList = displayRenderData.map(slot => {
+      const renderedEvents = this.dataManger.slots.filter(o => o.render);
+      /* const resourceEventsList = renderedEvents.map(slot => {
       return (
         <DndResourceEvents
           {...this.props}
@@ -622,8 +611,6 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
         maxHeight: this.props.styles.maxHeight,
       };
       let resourceContentStyle: React.CSSProperties = {
-        // overflowX: 'auto',
-        // overflowY: 'auto',
         width: this.state.actualResourceWidth + resourceScrollbarWidth - 1,
         margin: `0px -${contentScrollbarWidth}px 0px 0px`,
         maxHeight: this.props.styles.maxHeight,
@@ -671,7 +658,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                 onMouseOut={this.handleResourceMouseOut}
                 onScroll={this.handleResourceScroll}
               >
-                <ResourceView contentScrollbarHeight={resourcePaddingBottom} />
+                <ResourceView scrollbarHeight={resourcePaddingBottom} />
               </div>
             </div>
           </div>
@@ -713,8 +700,8 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                 onScroll={this.handleContentScroll}
               >
                 <div style={{ width: this.state.actualCellWidth, height: contentHeight }}>
-                  <div className="scheduler-content">
-                    <table className="scheduler-content-table">
+                  <div className="event-container">
+                    <table className="event-table">
                       <tbody>{/*resourceEventsList*/ null}</tbody>
                     </table>
                   </div>
@@ -777,13 +764,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
             </div>
           </Col>
           <Col>
-            <Radio.Group
-              defaultValue={defaultValue}
-              size="default"
-              onChange={this.handleViewChange}
-            >
-              {viewButtons}
-            </Radio.Group>
+            <ViewSelector value={this.props.viewType} onChange={this.handleViewChange} />
           </Col>
           {this.props.rightCustomHeader}
         </Row>

@@ -73,6 +73,17 @@
     }
   }
 
+  .event-container {
+    position: relative;
+    z-index: 2;
+    table.event-table {
+      margin: 0;
+      padding: 0;
+      border: 0 solid #e9e9e9;
+      border-spacing: 0;
+    }
+  }
+
   .scheduler-bg {
     position: absolute;
     top: 0;
@@ -95,25 +106,18 @@
     .header-text {
       font-size: 12px;
       font-weight: 500;
-      &.bg-normal {
-        background-color: #fff;
-      }
-      &.bg-highlight {
-        color: #999999;
-        background-color: #fff0f6;
-      }
+    }
+    & .bg-normal {
+      background-color: #fff;
+    }
+    & .bg-highlight {
+      color: #999999;
+      background-color: #fff0f6;
     }
   }
 
   table.scheduler-table {
     border: 1px solid #e9e9e9;
-  }
-
-  table.scheduler-content-table {
-    margin: 0;
-    padding: 0;
-    border: 0 solid #e9e9e9;
-    border-spacing: 0;
   }
 
   table.resource-table tr,

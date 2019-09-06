@@ -9,28 +9,32 @@ export interface BodyViewProps {
 const BodyView: React.FC<BodyViewProps> = ({ width }) => {
   const contextValue = useSchedulerContext();
 
-  if (contextValue.source && contextValue.styles) {
-    const { slots, headers } = contextValue.source;
-    const renderedSlots = slots.filter(s => s.render);
-    const tableRows = renderedSlots.map(slot => {
-      const rowCells = headers.map((header, index) => {
-        const key = slot.id + '_' + header.time;
-        const style = index === headers.length - 1 ? {} : { width };
-        return (
-          <td key={key} style={style}>
-            <div></div>
-          </td>
-        );
-      });
+  if (contextValue.source) {
+    const { headers } = contextValue.source;
 
-      return (
-        <tr key={slot.id} style={{ height: slot.height }}>
-          {rowCells}
-        </tr>
-      );
-    });
-
-    return <tbody>{tableRows}</tbody>;
+    return (
+      <tbody>
+        {contextValue.source.slots
+          .filter(s => s.render)
+          .map(slot => {
+            return (
+              <tr key={slot.id} style={{ height: slot.height }}>
+                {headers.map((header, index) => {
+                  return (
+                    <td
+                      key={`${slot.id}_${header.time}`}
+                      className={header.workingTime ? 'bg-normal' : 'bg-highlight'}
+                      style={index === headers.length - 1 ? {} : { width }}
+                    >
+                      <div></div>
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+      </tbody>
+    );
   } else {
     return null;
   }

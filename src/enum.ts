@@ -18,9 +18,6 @@ export const ViewTypes = {
   Month: 'month',
   Quarter: 'quarter',
   Year: 'year',
-  Custom1: 'custom1',
-  Custom2: 'custom2',
-  Custom3: 'custom3',
 };
 
 export const DisplayTypes = {

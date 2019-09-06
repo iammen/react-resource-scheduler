@@ -8,7 +8,7 @@
   "types": "build/index.d.ts",
   "scripts": {
     "test": "jest",
-    "example": "webpack-dev-server --config ./webpack.dev.js --hot",
+    "example": "webpack-dev-server --config ./webpack.dev.js",
     "build-commonjs": "tsc --module commonjs --outDir ./dist/lib",
     "build-es": "tsc --module esnext --outDir ./dist/es",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",

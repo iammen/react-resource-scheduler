@@ -312,17 +312,7 @@ export class SchedulerDataManger {
               orderIndx = cell.renderedEvents.length;
             }
 
-            let render = true;
-            if (cellStart <= eventStart && index > 0) {
-              const previousCell = slot.cells[index - 1];
-              const previousCellStart = this.localeMoment(previousCell.start);
-              const previousCellEnd = this.localeMoment(previousCell.end);
-              if (previousCellEnd <= eventStart || previousCellStart >= eventEnd) {
-                render = true;
-              }
-            }
-
-            cell.renderedEvents[orderIndx] = { ...event, render, span };
+            cell.renderedEvents[orderIndx] = { ...event, render: true, span };
           }
         });
       }
@@ -656,23 +646,6 @@ export class SchedulerDataManger {
       this.endDate = this.localeMoment(this.startDate)
         .endOf('year')
         .format(DATE_FORMAT);
-    } else if (
-      this.viewType === ViewTypes.Custom1 ||
-      this.viewType === ViewTypes.Custom2 ||
-      this.viewType === ViewTypes.Custom3
-    ) {
-      if (this.customFunc && this.customFunc.getCustomSchedulerDate) {
-        const customDate = this.customFunc.getCustomSchedulerDate(this, num, date);
-        this.startDate = customDate.startDate;
-        this.endDate = customDate.endDate;
-        if (!!customDate.cellUnit) {
-          this.cellUnit = customDate.cellUnit;
-        }
-      } else {
-        throw new Error(
-          'This is custom view type, set behaviors.getCustomSchedulerDateFunc func to resolve the time window(startDate and endDate) yourself',
-        );
-      }
     }
   }
 

@@ -12,13 +12,7 @@ export const getDateLabel = (
   const end = schedulerData.localeMoment(endDate);
   let dateLabel = start.format('MMM D, YYYY');
 
-  if (
-    viewMode === ViewTypes.Week ||
-    (start !== end &&
-      (viewMode === ViewTypes.Custom1 ||
-        viewMode === ViewTypes.Custom2 ||
-        viewMode === ViewTypes.Custom3))
-  ) {
+  if (viewMode === ViewTypes.Week || start !== end) {
     dateLabel = `${start.format('MMM D')}-${end.format('D, YYYY')}`;
     if (start.month() !== end.month()) {
       dateLabel = `${start.format('MMM D')}-${end.format('MMM D, YYYY')}`;
