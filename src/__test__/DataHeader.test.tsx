@@ -1,12 +1,12 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import HeaderView from '../HeaderView';
+import DataHeaderView from '../DataHeaderView';
 import * as OurContext from '../SchedulerContext';
 import { ViewTypes } from '../enum';
 import DemoData from './DemoData';
 import { SchedulerDataManger } from '../SchedulerDataManager';
 
-describe('HeaderView with SchedulerContext', () => {
+describe('DataHeaderView with SchedulerContext', () => {
   const styles = {
     cellWidth: 40,
     headerHeight: 40,
@@ -29,7 +29,7 @@ describe('HeaderView with SchedulerContext', () => {
       styles,
     };
     jest.spyOn(OurContext, 'useSchedulerContext').mockImplementation(() => contextValues);
-    const wrapper = shallow(<HeaderView height={800} width={1024} />);
+    const wrapper = shallow(<DataHeaderView height={800} width={1024} />);
     expect(wrapper.find('.header-text')).toHaveLength(7);
   });
 
@@ -44,7 +44,7 @@ describe('HeaderView with SchedulerContext', () => {
     const TestWithContextComp = () => {
       return (
         <OurContext.SchedulerContext.Provider value={{ styles, source: schedulerData }}>
-          <HeaderView width={1024} height={800} />
+          <DataHeaderView width={1024} height={800} />
         </OurContext.SchedulerContext.Provider>
       );
     };

@@ -8,7 +8,7 @@ import Radio, { RadioChangeEvent } from 'antd/lib/radio';
 import Popover from 'antd/lib/popover';
 import Calendar from 'antd/lib/calendar';
 import BodyView from './BodyView';
-import HeaderView from './HeaderView';
+import DataHeaderView from './DataHeaderView';
 import ResourceView from './ResourceView';
 import AgendaView from './AgendaView';
 import { ViewSelector } from './ViewSelector';
@@ -25,7 +25,7 @@ import { getScrollSpecialMoment } from './_util/getScrollSpecialMoment';
 import { Event, ViewRender, Resource } from './interface';
 import { ViewTypes, DisplayTypes } from './enum';
 import { SchedulerDataManger } from './SchedulerDataManager';
-import { DATE_FORMAT } from './config';
+import { DATE_FORMAT } from './constants';
 
 export type ViewType = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
 export type DisplayType = 'agenda' | 'resource' | 'task';
@@ -45,6 +45,7 @@ export interface SchedulerProps {
   dndSources?: [];
   events: Event[];
   dateFormat: string;
+  language: string;
   timeFormat: string;
   leftCustomHeader: React.ReactNode;
   locale: string;
@@ -113,6 +114,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     currentDate: moment().format(DATE_FORMAT),
     displayType: 'task',
     dateFormat: 'ddd M/D',
+    language: 'en',
     timeFormat: 'ha',
     leftCustomHeader: undefined,
     locale: 'en',
@@ -126,7 +128,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     },
     viewRender: {
       cellWidth: {
-        day: 50,
+        day: 34,
         week: '12%',
         month: 80,
         quarter: 80,
@@ -213,7 +215,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
 
     this.dataManger = new SchedulerDataManger({
       currentDate: props.currentDate,
-      language: 'en',
+      language: props.language,
       viewType: props.viewType,
       events: props.events,
       resources: props.resources,
@@ -575,7 +577,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   render() {
     const { config } = this.dataManger;
     const calendarPopoverEnabled = config.calendarPopoverEnabled;
-    const dateLabel = this.dataManger.getDateLabel();
+    const dateTitle = this.dataManger.getDateTitle();
 
     let schedulerBody: JSX.Element;
     if (this.props.displayType === DisplayTypes.Agenda) {
@@ -632,18 +634,15 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
         : this.dataManger.config.resourceName;
       schedulerBody = (
         <div>
-          <div
-            className="resource-scrollbar-container"
-            style={{ width: this.state.actualResourceWidth }}
-          >
-            <div className="resource-container">
+          <div className="rss_resource_scroll" style={{ width: this.state.actualResourceWidth }}>
+            <div className="rss_resource_container">
               <div
-                className="resource-header"
+                className="rss_resource_header"
                 style={{
                   height: this.props.styles.headerHeight,
                 }}
               >
-                <table className="resource-table">
+                <table className="rss_resource_table">
                   <thead>
                     <tr style={{ height: this.props.styles.headerHeight }}>
                       <th className="header3-text">{resourceName}</th>
@@ -662,16 +661,15 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
               </div>
             </div>
           </div>
-          <div className="cell-scroll-container" style={{ width: this.state.availableCellWidth }}>
-            <div className="cell-container" style={{ width: this.state.actualCellWidth - 1 }}>
+          <div className="rss_data_scroll" style={{ width: this.state.availableCellWidth }}>
+            <div className="rss_data_container" style={{ width: this.state.actualCellWidth - 1 }}>
               <div
-                className="cell-header"
+                className="rss_data_header"
                 style={{
                   height: this.props.styles.headerHeight,
                 }}
               >
                 <div
-                  className="cell-header-table"
                   style={{
                     margin: `0px 0px -${contentScrollbarHeight}px`,
                   }}
@@ -680,7 +678,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                   onMouseOut={this.handleHeadMouseOut}
                   onScroll={this.handleHeadScroll}
                 >
-                  <HeaderView
+                  <DataHeaderView
                     format={
                       this.props.viewType === ViewTypes.Day
                         ? this.props.timeFormat
@@ -705,9 +703,9 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                       <tbody>{/*resourceEventsList*/ null}</tbody>
                     </table>
                   </div>
-                  <div className="scheduler-bg">
+                  <div className="scheduler-table-container">
                     <table
-                      className="scheduler-bg-table"
+                      className="scheduler-table"
                       style={{ width: this.state.actualCellWidth }}
                       ref={this.tableBodyRef}
                     >
@@ -730,7 +728,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     let schedulerHeader = <div />;
     if (config.headerEnabled) {
       schedulerHeader = (
-        <Row type="flex" align="middle" justify="space-between" className="scheduler-navigator">
+        <Row type="flex" align="middle" justify="space-between">
           {this.props.leftCustomHeader}
           <Col>
             <div className="header2-text">
@@ -749,11 +747,11 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                   onVisibleChange={this.handleVisibleChange}
                 >
                   <span className={'header2-text-label'} style={{ cursor: 'pointer' }}>
-                    {dateLabel}
+                    {dateTitle}
                   </span>
                 </Popover>
               ) : (
-                <span className={'header2-text-label'}>{dateLabel}</span>
+                <span className={'header2-text-label'}>{dateTitle}</span>
               )}
               <Icon
                 type="right"
@@ -775,11 +773,12 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
       <SchedulerContext.Provider value={{ source: this.dataManger, styles: this.props.styles }}>
         <div
           ref={this.selfRef}
-          id="rss-scheduler"
+          id="rss_root"
+          className="rss_container"
           style={{ width: this.isResponsive() ? this.props.width : `${this.props.width}px` }}
         >
-          <div className="scheduler-header">{schedulerHeader}</div>
-          <div className="scheduler-body">{schedulerBody}</div>
+          <div className="rss_navigator">{schedulerHeader}</div>
+          <div className="rss_scheduler">{schedulerBody}</div>
         </div>
       </SchedulerContext.Provider>
     );

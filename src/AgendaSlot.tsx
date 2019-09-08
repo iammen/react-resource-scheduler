@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import AgendaCell from './AgendaCell';
-import { DATE_FORMAT } from './config';
+import { DATE_FORMAT } from './constants';
 import { Slot } from './interface';
 import { useSchedulerContext } from './SchedulerContext';
 
@@ -27,20 +27,25 @@ export default class AgendaSlot extends Component<AgendaSlotProps, {}> {
         const end = localeMoment(endDate)
           .add(1, 'days')
           .format(DATE_FORMAT);
-        const headerStart = localeMoment(cell.start).format(DATE_FORMAT);
-        const headerEnd = localeMoment(cell.end).format(DATE_FORMAT);
+        const headerStart = localeMoment(cell.startTime).format(DATE_FORMAT);
+        const headerEnd = localeMoment(cell.endTime).format(DATE_FORMAT);
 
         if (start === headerStart && end === headerEnd) {
-          cell.renderedEvents.forEach(event => {
+          cell.renderedEvents.forEach(renderedEvent => {
             const durationStart = localeMoment(startDate);
             const durationEnd = localeMoment(endDate).add(1, 'days');
-            const eventStart = localeMoment(event.start);
-            const eventEnd = localeMoment(event.end);
+            const eventStart = localeMoment(renderedEvent.event.start);
+            const eventEnd = localeMoment(renderedEvent.event.end);
             const isStart = eventStart >= durationStart;
             const isEnd = eventEnd < durationEnd;
 
             return (
-              <AgendaCell key={event.id} defaultValue={event} isStart={isStart} isEnd={isEnd} />
+              <AgendaCell
+                key={renderedEvent.event.id}
+                defaultValue={renderedEvent.event}
+                isStart={isStart}
+                isEnd={isEnd}
+              />
             );
           });
         }

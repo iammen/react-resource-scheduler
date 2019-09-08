@@ -4,7 +4,7 @@ import Col from 'antd/lib/col';
 import Row from 'antd/lib/row';
 import 'antd/lib/grid/style/index.css';
 import { useSchedulerContext } from './SchedulerContext';
-import { DATETIME_FORMAT } from './config';
+import { DATETIME_FORMAT } from './constants';
 
 export interface EventPopoverProps {
   text: string;

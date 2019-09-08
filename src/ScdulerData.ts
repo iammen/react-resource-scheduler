@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { rrulestr } from 'rrule';
-import config from './config';
+import config from './constants';
 import {
   Cell,
   CustomSchedulerDate,
@@ -12,7 +12,7 @@ import {
   Slot,
 } from './interface';
 import { ViewTypes, CellUnits } from './enum';
-import { DATE_FORMAT, DATETIME_FORMAT } from './config';
+import { DATE_FORMAT, DATETIME_FORMAT } from './constants';
 import { isWorkingTime } from './_util/isWorkingTime';
 import { getDateLabel } from './_util/getDateLabel';
 
@@ -269,8 +269,8 @@ export class SchedulerData {
         let indx = -1;
 
         slot.cells.forEach((cell, index) => {
-          const cellStart = this.localeMoment(cell.start);
-          const cellEnd = this.localeMoment(cell.end);
+          const cellStart = this.localeMoment(cell.startTime);
+          const cellEnd = this.localeMoment(cell.endTime);
 
           if (cellEnd > eventStart && cellStart < eventEnd) {
             cell.eventCount = (cell.eventCount || 0) + 1;
@@ -303,8 +303,8 @@ export class SchedulerData {
             let render = cellStart <= eventStart || index === 0;
             if (render === false) {
               const previousHeader = slot.cells[index - 1];
-              const previousHeaderStart = this.localeMoment(previousHeader.start);
-              const previousHeaderEnd = this.localeMoment(previousHeader.end);
+              const previousHeaderStart = this.localeMoment(previousHeader.startTime);
+              const previousHeaderEnd = this.localeMoment(previousHeader.endTime);
               if (previousHeaderEnd <= eventStart || previousHeaderStart >= eventEnd) {
                 render = true;
               }
@@ -558,8 +558,8 @@ export class SchedulerData {
 
   private initializeCell(header: SchedulerHeader) {
     const startDt = this.localeMoment(header.time);
-    const start = startDt.format(DATETIME_FORMAT);
-    const end = this.showAgenda
+    const startTime = startDt.format(DATETIME_FORMAT);
+    const endTime = this.showAgenda
       ? this.viewType === ViewTypes.Week
         ? startDt.add(1, 'weeks').format(DATETIME_FORMAT)
         : this.viewType === ViewTypes.Day
@@ -580,12 +580,12 @@ export class SchedulerData {
     return {
       time: header.time,
       workingTime: header.workingTime,
-      start,
-      end,
+      startTime,
+      endTime,
       eventCount: 0,
       addMore: 0,
       addMoreIndex: 0,
-      renderedEvents: [], // [, , ,],
+      renderedEvents: [],
     } as Cell;
   }
 

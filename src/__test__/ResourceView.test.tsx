@@ -29,7 +29,7 @@ describe('<ResourceView />', () => {
     };
 
     jest.spyOn(AppContext, 'useSchedulerContext').mockImplementation(() => contextValue);
-    const wrapper = shallow(<ResourceView contentScrollbarHeight={24} />);
-    expect(wrapper.find('.resource-table')).toBeDefined();
+    const wrapper = shallow(<ResourceView scrollbarHeight={24} />);
+    expect(wrapper.find('.rss_resource_table')).toBeDefined();
   });
 });

@@ -1,41 +1,36 @@
-#rss-scheduler {
-  @import '~antd/lib/style/core/index.less';
-  @import '~antd/lib/style/themes/default.less';
-
+.rss_container {
   padding: 0;
   margin: 0;
   position: relative;
 
-  .scheduler-header {
+  .rss_navigator {
     background-color: #f5f5f5;
     border: 1px solid rgba(221, 221, 221, 0.6);
     border-bottom: 0;
     height: 58px;
-    .scheduler-navigator {
-      padding: 12px;
-    }
+    padding: 12px;
   }
 
-  .scheduler-body {
+  .rss_scheduler {
     width: 100%;
   }
 
-  .resource-scrollbar-container {
+  .rss_resource_scroll {
     display: inline-block;
     vertical-align: top;
 
-    .resource-container {
+    .rss_resource_container {
       border-left: 1px solid #e9e9e9;
       border-top: 1px solid #e9e9e9;
       overflow: hidden;
-      .resource-header {
+      .rss_resource_header {
         overflow: hidden;
         border-bottom: 1px solid #e9e9e9;
       }
     }
   }
 
-  .cell-scroll-container {
+  .rss_data_scroll {
     display: inline-block;
     vertical-align: top;
     position: relative;
@@ -43,7 +38,7 @@
     border-left: 1px solid #e9e9e9;
     border-right: 1px solid #e9e9e9;
 
-    .cell-container {
+    .rss_data_container {
       position: relative;
       border-left: 1px solid #e9e9e9;
       border-top: 1px solid #e9e9e9;
@@ -52,11 +47,11 @@
       vertical-align: top;
       overflow: hidden;
 
-      .cell-header {
+      .rss_data_header {
         overflow: hidden;
         border-bottom: 1px solid #e9e9e9;
       }
-      .cell-header-table {
+      .rss_data_header_table {
         overflow-x: hidden;
         overflow-y: hidden;
       }
@@ -84,7 +79,7 @@
     }
   }
 
-  .scheduler-bg {
+  .scheduler-table-container {
     position: absolute;
     top: 0;
     left: 0;
@@ -94,10 +89,9 @@
     height: 100%;
   }
 
-  table.resource-table,
-  table.scheduler-bg-table,
+  table.rss_resource_table,
   table.scheduler-table,
-  table.scheduler-header-table {
+  table.rss_data_header_table {
     width: 100%;
     margin: 0;
     padding: 0;
@@ -116,34 +110,28 @@
     }
   }
 
-  table.scheduler-table {
-    border: 1px solid #e9e9e9;
-  }
-
-  table.resource-table tr,
-  table.scheduler-bg-table tr,
+  table.rss_resource_table tr,
   table.scheduler-table tr,
-  table.scheduler-header-table tr {
+  table.rss_data_header_table tr {
     border-bottom: 1px solid #e9e9e9;
   }
 
-  table.resource-table th,
+  table.rss_resource_table th,
   table.scheduler-table th,
-  table.scheduler-header-table th,
-  table.resource-table td,
-  table.scheduler-bg-table td,
+  table.rss_data_header_table th,
+  table.rss_resource_table td,
   table.scheduler-table td {
     border-right: 1px solid #e9e9e9;
     border-bottom: 1px solid #e9e9e9;
   }
 
-  table.scheduler-bg-table th {
+  table.scheduler-table th {
     border-right: 1px solid #e9e9e9;
   }
 
-  table.resource-table tr th:last-child,
+  table.rss_resource_table tr th:last-child,
   table.scheduler-table tr th:last-child,
-  table.resource-table tr td:last-child,
+  table.rss_resource_table tr td:last-child,
   table.scheduler-table tr td:last-child {
     border-right: 0;
   }

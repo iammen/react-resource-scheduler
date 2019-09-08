@@ -5,13 +5,13 @@ import { useSchedulerContext } from './SchedulerContext';
 import moment from 'moment';
 import { SchedulerHeader } from './interface';
 
-export interface HeaderViewProps {
+export interface DataHeaderViewProps {
   format?: string;
   height: number;
   width: number;
 }
 
-const HeaderView: React.FC<HeaderViewProps> = ({ format, height, width }) => {
+const DataHeaderView: React.FC<DataHeaderViewProps> = ({ format, height, width }) => {
   const contextValue = useSchedulerContext();
 
   const renderHeader = (head: SchedulerHeader, locale: typeof moment, headerFormat?: string) => {
@@ -28,7 +28,7 @@ const HeaderView: React.FC<HeaderViewProps> = ({ format, height, width }) => {
     const minuteStepsInHour = contextValue.source.getMinuteStepsInHour();
 
     return (
-      <table className="scheduler-header-table">
+      <table className="rss_data_header_table">
         <thead>
           <tr style={{ height }}>
             {cellUnit === CellUnits.Hour
@@ -71,14 +71,14 @@ const HeaderView: React.FC<HeaderViewProps> = ({ format, height, width }) => {
   }
 };
 
-HeaderView.propTypes = {
+DataHeaderView.propTypes = {
   format: PropTypes.string,
   height: PropTypes.number.isRequired,
   width: PropTypes.number.isRequired,
 };
 
-HeaderView.defaultProps = {
+DataHeaderView.defaultProps = {
   format: 'ddd M/D',
 };
 
-export default HeaderView;
+export default DataHeaderView;

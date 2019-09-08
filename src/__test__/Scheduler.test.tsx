@@ -17,7 +17,7 @@ describe('<Scheduler />', () => {
       />,
     );
     expect(wrapper.find('.resource-header')).toBeDefined();
-    expect(wrapper.find('.scheduler-bg-table')).toBeDefined();
+    expect(wrapper.find('.scheduler-table')).toBeDefined();
   });
 
   describe('props and method', () => {

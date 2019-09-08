@@ -20,7 +20,7 @@ const ResourceView: React.FC<ResourceViewProps> = ({
   if (contextValue.source) {
     return (
       <div style={{ paddingBottom: scrollbarHeight }}>
-        <table className="resource-table">
+        <table className="rss_resource_table">
           <tbody>
             {contextValue.source.slots
               .filter(o => o.render)

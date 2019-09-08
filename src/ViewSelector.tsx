@@ -1,6 +1,6 @@
 import React from 'react';
 import Radio, { RadioChangeEvent } from 'antd/lib/radio';
-import { DEFAULT_VIEW_TYPES } from './config';
+import { DEFAULT_VIEW_TYPES } from './constants';
 import 'antd/lib/radio/style/index.css';
 
 export interface ViewSelectorProps {

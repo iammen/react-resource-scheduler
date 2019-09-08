@@ -1,8 +1,8 @@
 export interface Cell {
   workingTime: boolean;
   time: string;
-  start: string;
-  end: string;
+  startTime: string;
+  endTime: string;
   eventCount: number;
   addMore: number;
   addMoreIndex: number;
@@ -44,20 +44,9 @@ export interface EventGroup {
 }
 
 export interface RenderedEvent {
-  id: number | string;
-  groupId: number;
-  groupName: string;
-  start: string;
-  end: string;
-  resourceId: string;
-  text: string;
-  bgColor?: string;
-  render?: boolean;
-  rrule?: string;
-  recurringEventId?: number | string;
-  recurringEventStart?: string;
-  recurringEventEnd?: string;
-  span?: number;
+  event: Event;
+  render: boolean;
+  span: number;
 }
 
 export interface Resource {
