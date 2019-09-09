@@ -1,9 +1,8 @@
 import { SchedulerDataManger } from '../SchedulerDataManager';
-import { ViewTypes } from '../enum';
-import { SchedulerData } from '../ScdulerData';
+import { TimePeriods } from '../enum';
 
 export const getDateLabel = (
-  schedulerData: SchedulerData | SchedulerDataManger,
+  schedulerData: SchedulerDataManger,
   viewMode: string,
   startDate: string,
   endDate: string,
@@ -12,7 +11,7 @@ export const getDateLabel = (
   const end = schedulerData.localeMoment(endDate);
   let dateLabel = start.format('MMM D, YYYY');
 
-  if (viewMode === ViewTypes.Week || start !== end) {
+  if (viewMode === TimePeriods.Week || start !== end) {
     dateLabel = `${start.format('MMM D')}-${end.format('D, YYYY')}`;
     if (start.month() !== end.month()) {
       dateLabel = `${start.format('MMM D')}-${end.format('MMM D, YYYY')}`;
@@ -20,11 +19,11 @@ export const getDateLabel = (
     if (start.year() !== end.year()) {
       dateLabel = `${start.format('MMM D, YYYY')}-${end.format('MMM D, YYYY')}`;
     }
-  } else if (viewMode === ViewTypes.Month) {
+  } else if (viewMode === TimePeriods.Month) {
     dateLabel = start.format('MMMM YYYY');
-  } else if (viewMode === ViewTypes.Quarter) {
+  } else if (viewMode === TimePeriods.Quarter) {
     dateLabel = `${start.format('MMM D')}-${end.format('MMM D, YYYY')}`;
-  } else if (viewMode === ViewTypes.Year) {
+  } else if (viewMode === TimePeriods.Year) {
     dateLabel = start.format('YYYY');
   }
 

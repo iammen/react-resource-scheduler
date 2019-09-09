@@ -4,31 +4,30 @@ import moment from 'moment';
 import Col from 'antd/lib/col';
 import Row from 'antd/lib/row';
 import Icon from 'antd/lib/icon';
-import Radio, { RadioChangeEvent } from 'antd/lib/radio';
+import { RadioChangeEvent } from 'antd/lib/radio';
 import Popover from 'antd/lib/popover';
 import Calendar from 'antd/lib/calendar';
 import BodyView from './BodyView';
 import DataHeaderView from './DataHeaderView';
 import ResourceView from './ResourceView';
 import AgendaView from './AgendaView';
-import { ViewSelector } from './ViewSelector';
+import { TimePeriodSelector } from './TimePeriodSelector';
 
 import 'antd/lib/select/style/index.css';
 import 'antd/lib/grid/style/index.css';
-import 'antd/lib/radio/style/index.css';
 import 'antd/lib/popover/style/index.css';
 import 'antd/lib/calendar/style/index.css';
 import './less/style.less';
 
 import { SchedulerContext } from './SchedulerContext';
 import { getScrollSpecialMoment } from './_util/getScrollSpecialMoment';
-import { Event, ViewRender, Resource } from './interface';
-import { ViewTypes, DisplayTypes } from './enum';
+import { Event, Resource } from './interface';
+import { TimePeriods, ViewTypes } from './enum';
 import { SchedulerDataManger } from './SchedulerDataManager';
 import { DATE_FORMAT } from './constants';
 
-export type ViewType = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
-export type DisplayType = 'agenda' | 'resource' | 'task';
+export type TimePeriod = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
+export type ViewType = 'agenda' | 'timeline' | 'day' | 'week' | 'month' | 'map';
 
 export interface Styles {
   cellWidth: number;
@@ -41,7 +40,7 @@ export interface Styles {
 export interface SchedulerProps {
   agendaView?: React.ReactNode;
   currentDate: string;
-  displayType: DisplayType;
+  viewType: ViewType;
   dndSources?: [];
   events: Event[];
   dateFormat: string;
@@ -50,10 +49,10 @@ export interface SchedulerProps {
   leftCustomHeader: React.ReactNode;
   locale: string;
   resources: Resource[];
+  resourceWidth: number | string;
   rightCustomHeader: React.ReactNode;
   styles: Styles;
-  viewRender: ViewRender;
-  viewType: ViewType;
+  timePeriod: TimePeriod;
   width: number | string;
 
   conflictOccurred?: () => void;
@@ -93,7 +92,6 @@ export interface SchedulerProps {
 }
 
 interface SchedulerStates {
-  actualCellWidth: number;
   actualResourceWidth: number;
   actualSchedulerWidth: number;
   availableCellWidth: number;
@@ -112,12 +110,11 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   static defaultProps: Partial<SchedulerProps> = {
     agendaView: undefined,
     currentDate: moment().format(DATE_FORMAT),
-    displayType: 'task',
     dateFormat: 'ddd M/D',
     language: 'en',
-    timeFormat: 'ha',
     leftCustomHeader: undefined,
     locale: 'en',
+    resourceWidth: 200,
     rightCustomHeader: undefined,
     styles: {
       cellWidth: 40,
@@ -126,43 +123,21 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
       slotHeaderWidth: 160,
       slotHeight: 40,
     },
-    viewRender: {
-      cellWidth: {
-        day: 34,
-        week: '12%',
-        month: 80,
-        quarter: 80,
-        year: 80,
-      },
-      maxEvents: {
-        day: 99,
-        week: 99,
-        month: 99,
-        quarter: 99,
-        year: 99,
-      },
-      resourceWidth: {
-        day: 300,
-        week: '16%',
-        month: 200,
-        quarter: 200,
-        year: 200,
-      },
-    },
-    viewType: 'week',
+    timeFormat: 'ha',
+    timePeriod: 'week',
+    viewType: 'timeline',
     width: '100%',
   };
 
   static propTypes = {
     agendaView: PropTypes.node,
-    displayType: PropTypes.string,
-    dndSources: PropTypes.array,
     dateFormat: PropTypes.string,
+    timePeriod: PropTypes.string,
+    dndSources: PropTypes.array,
     leftCustomHeader: PropTypes.node,
     rightCustomHeader: PropTypes.node,
     styles: PropTypes.object,
     timeFormat: PropTypes.string,
-    viewRender: PropTypes.object,
     viewType: PropTypes.string,
     width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   };
@@ -198,7 +173,6 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     this.currentArea = -1;
 
     this.state = {
-      actualCellWidth: 0,
       actualResourceWidth: 0,
       actualSchedulerWidth: 0,
       availableCellWidth: 0,
@@ -216,7 +190,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     this.dataManger = new SchedulerDataManger({
       currentDate: props.currentDate,
       language: props.language,
-      viewType: props.viewType,
+      timePeriod: props.timePeriod,
       events: props.events,
       resources: props.resources,
     });
@@ -256,44 +230,12 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
               index++;
             }
           });
-          this.contentRef.current.scrollLeft = (index - 1) * Number(this.resolveCellWidth());
+          this.contentRef.current.scrollLeft = (index - 1) * 10;
 
           this.dataManger.setScrollToSpecialMoment(false);
         }
       }
     }
-  }
-
-  getCellWidthProp() {
-    return this.props.viewType === ViewTypes.Day
-      ? this.props.viewRender.cellWidth.day
-      : this.props.viewType === ViewTypes.Week
-      ? this.props.viewRender.cellWidth.week
-      : this.props.viewType === ViewTypes.Month
-      ? this.props.viewRender.cellWidth.month
-      : this.props.viewType === ViewTypes.Quarter
-      ? this.props.viewRender.cellWidth.quarter
-      : this.props.viewType === ViewTypes.Year
-      ? this.props.viewRender.cellWidth.year
-      : 17;
-  }
-
-  getResourceWidthProp() {
-    if (this.props.displayType === DisplayTypes.Agenda) {
-      return this.props.styles.slotHeaderWidth;
-    }
-
-    return this.props.viewType === ViewTypes.Day
-      ? this.props.viewRender.resourceWidth.day
-      : this.props.viewType === ViewTypes.Week
-      ? this.props.viewRender.resourceWidth.week
-      : this.props.viewType === ViewTypes.Month
-      ? this.props.viewRender.resourceWidth.month
-      : this.props.viewType === ViewTypes.Quarter
-      ? this.props.viewRender.resourceWidth.quarter
-      : this.props.viewType === ViewTypes.Year
-      ? this.props.viewRender.resourceWidth.year
-      : 200;
   }
 
   goNext = () => {
@@ -419,12 +361,12 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   };
 
   handleViewChange = (e: RadioChangeEvent) => {
-    const viewType = e.target.value;
+    const timePeriod = e.target.value;
 
     if (this.props.onViewChange) {
       this.props.onViewChange(this.dataManger, {
-        viewType,
-        showAgenda: this.props.displayType,
+        timePeriod,
+        showAgenda: this.props.viewType,
         isEventPerspective: false,
       });
     }
@@ -438,18 +380,12 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     this.resolveScrollbarSize();
   };
 
-  isContentResponsive() {
-    const cellWidth = this.getCellWidthProp();
-    return (cellWidth || '').toString().endsWith('%');
-  }
-
   isResponsive() {
     return typeof this.props.width === 'string' && this.props.width.endsWith('%');
   }
 
   isResourceResponsive() {
-    const resourceWidth = this.getResourceWidthProp();
-    return resourceWidth.toString().endsWith('%');
+    return this.props.resourceWidth.toString().endsWith('%');
   }
 
   resolveBodyDesiredHeight() {
@@ -463,26 +399,13 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     return height;
   }
 
-  resolveCellWidth() {
-    if (this.selfRef.current) {
-      const cellWidth = this.getCellWidthProp();
-      return this.isContentResponsive()
-        ? (Number(this.selfRef.current.offsetWidth) *
-            Number((cellWidth || 17).toString().slice(0, -1))) /
-            100
-        : Number(cellWidth.toString());
-    } else {
-      return 0;
-    }
-  }
-
   resolveResourceWidth() {
     if (this.selfRef.current) {
-      const resourceWidthProp = this.getResourceWidthProp();
       return this.isResourceResponsive()
-        ? (this.selfRef.current.offsetWidth * Number(resourceWidthProp.toString().slice(0, -1))) /
+        ? (this.selfRef.current.offsetWidth *
+            Number(this.props.resourceWidth.toString().slice(0, -1))) /
             100
-        : Number(resourceWidthProp.toString());
+        : Number(this.props.resourceWidth);
     } else {
       return 0;
     }
@@ -531,17 +454,19 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
       this.selfRef.current &&
       this.state.actualSchedulerWidth !== this.selfRef.current.clientWidth
     ) {
-      const actualCellWidth = this.resolveTotalCellWidth();
+      const actualSchedulerWidth = this.selfRef.current.clientWidth;
       const actualResourceWidth = this.resolveResourceWidth();
+      this.dataManger.recalDimensions(actualSchedulerWidth, actualResourceWidth);
+
       states = {
         ...states,
-        actualCellWidth,
         actualResourceWidth,
-        actualSchedulerWidth: this.selfRef.current.clientWidth,
+        actualSchedulerWidth,
         availableCellWidth:
-          actualResourceWidth + actualCellWidth > this.selfRef.current.clientWidth
+          actualResourceWidth + this.dataManger.dimensions.dataLength >
+          this.selfRef.current.clientWidth
             ? this.selfRef.current.clientWidth - actualResourceWidth
-            : actualCellWidth,
+            : this.dataManger.dimensions.dataLength,
       };
       isStateChange = true;
     }
@@ -570,20 +495,15 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     }
   };
 
-  resolveTotalCellWidth() {
-    return this.dataManger.headers.length * this.resolveCellWidth();
-  }
-
   render() {
     const { config } = this.dataManger;
     const calendarPopoverEnabled = config.calendarPopoverEnabled;
     const dateTitle = this.dataManger.getDateTitle();
 
     let schedulerBody: JSX.Element;
-    if (this.props.displayType === DisplayTypes.Agenda) {
+    if (this.props.viewType === ViewTypes.Agenda) {
       schedulerBody = <AgendaView {...this.props} />;
     } else {
-      const cellWidth = this.resolveCellWidth();
       // const DndResourceEvents = this.state.dndContext.getDropTarget();
       // const eventDndSource = this.state.dndContext.getDndSource();
 
@@ -662,7 +582,10 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
             </div>
           </div>
           <div className="rss_data_scroll" style={{ width: this.state.availableCellWidth }}>
-            <div className="rss_data_container" style={{ width: this.state.actualCellWidth - 1 }}>
+            <div
+              className="rss_data_container"
+              style={{ width: this.dataManger.dimensions.dataLength - 1 }}
+            >
               <div
                 className="rss_data_header"
                 style={{
@@ -680,12 +603,12 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                 >
                   <DataHeaderView
                     format={
-                      this.props.viewType === ViewTypes.Day
+                      this.props.timePeriod === TimePeriods.Day
                         ? this.props.timeFormat
                         : this.props.dateFormat
                     }
                     height={this.props.styles.headerHeight}
-                    width={cellWidth}
+                    width={this.dataManger.dimensions.dataLength}
                   />
                 </div>
               </div>
@@ -697,7 +620,9 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                 onMouseOut={this.handleContentMouseOut}
                 onScroll={this.handleContentScroll}
               >
-                <div style={{ width: this.state.actualCellWidth, height: contentHeight }}>
+                <div
+                  style={{ width: this.dataManger.dimensions.dataLength, height: contentHeight }}
+                >
                   <div className="event-container">
                     <table className="event-table">
                       <tbody>{/*resourceEventsList*/ null}</tbody>
@@ -706,10 +631,10 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                   <div className="scheduler-table-container">
                     <table
                       className="scheduler-table"
-                      style={{ width: this.state.actualCellWidth }}
+                      style={{ width: this.dataManger.dimensions.dataLength }}
                       ref={this.tableBodyRef}
                     >
-                      <BodyView width={cellWidth} />
+                      <BodyView width={this.dataManger.dimensions.dataLength} />
                     </table>
                   </div>
                 </div>
@@ -726,7 +651,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
       </div>
     );
     let schedulerHeader = <div />;
-    if (config.headerEnabled) {
+    if (config.showNavigator) {
       schedulerHeader = (
         <Row type="flex" align="middle" justify="space-between">
           {this.props.leftCustomHeader}
@@ -762,7 +687,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
             </div>
           </Col>
           <Col>
-            <ViewSelector value={this.props.viewType} onChange={this.handleViewChange} />
+            <TimePeriodSelector value={this.props.timePeriod} onChange={this.handleViewChange} />
           </Col>
           {this.props.rightCustomHeader}
         </Row>

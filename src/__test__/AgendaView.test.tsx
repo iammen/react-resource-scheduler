@@ -1,7 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import AgendaView from '../AgendaView';
-import { ViewTypes } from '../enum';
+import { TimePeriods } from '../enum';
 import DemoData from './DemoData';
 import * as AppContext from '../SchedulerContext';
 import { SchedulerDataManger } from '../SchedulerDataManager';
@@ -18,7 +18,7 @@ describe('<AgendaView />', () => {
   it('it should mock with context', () => {
     const schedulerData = new SchedulerDataManger({
       currentDate: '2017-12-18',
-      viewType: ViewTypes.Week,
+      viewType: TimePeriods.Week,
       resources: DemoData.resources,
       events: DemoData.events,
       language: 'th',

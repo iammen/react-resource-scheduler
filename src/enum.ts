@@ -12,7 +12,7 @@ export const SummaryPositions = {
   BottomLeft: 5,
 };
 
-export const ViewTypes = {
+export const TimePeriods = {
   Day: 'day',
   Week: 'week',
   Month: 'month',
@@ -20,8 +20,7 @@ export const ViewTypes = {
   Year: 'year',
 };
 
-export const DisplayTypes = {
+export const ViewTypes = {
   Agenda: 'agenda',
-  Resource: 'resource',
-  Task: 'task',
+  Timeline: 'timeline',
 };

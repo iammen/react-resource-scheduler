@@ -2,7 +2,7 @@ import React from 'react';
 import { mount, shallow } from 'enzyme';
 import Scheduler from '../Scheduler';
 import DemoData from './DemoData';
-import { ViewTypes } from '../enum';
+import { TimePeriods } from '../enum';
 import { SchedulerDataManger } from '../SchedulerDataManager';
 
 describe('<Scheduler />', () => {

@@ -1,22 +1,19 @@
 import React from 'react';
 import Radio, { RadioChangeEvent } from 'antd/lib/radio';
-import { DEFAULT_VIEW_TYPES } from './constants';
+import { VIEW_MODES } from './constants';
 import 'antd/lib/radio/style/index.css';
 
-export interface ViewSelectorProps {
+export interface TimePeriodSelectorProps {
   value?: any;
   onChange?: (e: RadioChangeEvent) => void;
 }
 
-export const ViewSelector: React.FC<ViewSelectorProps> = ({ value, onChange }) => {
+export const TimePeriodSelector: React.FC<TimePeriodSelectorProps> = ({ value, onChange }) => {
   return (
     <Radio.Group value={value} size="default" onChange={onChange}>
-      {DEFAULT_VIEW_TYPES.map(item => {
+      {VIEW_MODES.map(item => {
         return (
-          <Radio.Button
-            key={`${item.viewType}${item.isEventPerspective ? 1 : 0}`}
-            value={item.viewType}
-          >
+          <Radio.Button key={`${item.mode}${item.isEventPerspective ? 1 : 0}`} value={item.mode}>
             <span style={{ margin: '0px 8px' }}>{item.text}</span>
           </Radio.Button>
         );

@@ -33,9 +33,9 @@ export default class AgendaCell extends Component<AgendaCellProps, {}> {
         : isEnd
         ? 'round-tail'
         : 'round-none';
-      let bgColor = config.defaultEventBgColor;
+      let bgColor = '#80C5F6';
       if (!!defaultValue.bgColor) {
-        bgColor = defaultValue.bgColor;
+        bgColor = '#80C5F6';
       }
 
       const titleText = getEventText(contextValue.source, defaultValue);

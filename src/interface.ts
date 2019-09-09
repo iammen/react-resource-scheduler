@@ -60,56 +60,45 @@ export interface SchedulerDataConfig {
   checkConflict: boolean;
   creatable: boolean;
   crossResourceMove: boolean;
-  customCellWidth?: number | string;
-  customMaxEvents?: any;
-  dayCellWidth: number;
-  dayMaxEvents: number;
-  dayResourceTableWidth: number;
   dayStartFrom: number;
   dayStopTo: number;
-  defaultEventBgColor: string;
   defaultExpanded: boolean;
-  displayWeekend: boolean;
+  defaultDataUnitLength: number;
   endResizable: boolean;
   eventItemHeight: number;
   eventItemLineHeight: number;
   eventItemPopoverEnabled: boolean;
-  headerEnabled: boolean;
+  maxEvents: number;
   minuteStep: number;
-  monthCellWidth: number;
-  monthMaxEvents: number;
-  monthResourceTableWidth: number;
   movable: boolean;
   nonAgendaSlotMinHeight: number;
-  nonWorkingTimeBodyBgColor: string;
-  nonWorkingTimeHeadBgColor: string;
-  nonWorkingTimeHeadColor: string;
-  quarterCellWidth: number;
-  quarterMaxEvents: number;
-  quarterResourceTableWidth: number;
   recurringEventsEnabled: boolean;
   relativeMove: boolean;
   resourceName: string;
-  schedulerMaxHeight: number;
-  schedulerWidth: number | string;
   scrollToSpecialMomentEnabled: boolean;
-  selectedAreaColor: string;
-  startResizable: boolean;
-  summaryColor: string;
+  showNavigator: boolean;
   summaryPosition: number;
   taskName: string;
-  views: View[];
-  weekCellWidth: number | string;
-  weekMaxEvents: number;
-  weekResourceTableWidth: number | string;
-  yearCellWidth: number;
-  yearMaxEvents: number;
-  yearResourceTableWidth: number;
 }
 
-export interface SchedulerHeader {
+export interface SchedulerDimension {
+  containerLength: number;
+  resourceLength: number;
+  dataLength: number;
+  dataUnitLength: number;
+  minimumDataUnitLength: number;
+}
+
+export interface XAxis {
+  endTime: Date;
+  startTime: Date;
+  length: number;
   workingTime: boolean;
+}
+
+export interface XAxisHeader {
   time: string;
+  workingTime: boolean;
 }
 
 export interface Slot {
@@ -129,15 +118,9 @@ export interface Slot {
 
 export interface View {
   text?: string;
-  viewType: string;
+  mode: string;
   showAgenda: boolean;
   isEventPerspective: boolean;
-}
-
-export interface ViewRender {
-  cellWidth: ViewType<number | string>;
-  maxEvents: ViewType<number>;
-  resourceWidth: ViewType<number | string>;
 }
 
 export interface ViewType<T> {

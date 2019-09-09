@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { CellUnits } from './enum';
 import { useSchedulerContext } from './SchedulerContext';
 import moment from 'moment';
-import { SchedulerHeader } from './interface';
+import { XAxisHeader } from './interface';
 
 export interface DataHeaderViewProps {
   format?: string;
@@ -14,7 +14,7 @@ export interface DataHeaderViewProps {
 const DataHeaderView: React.FC<DataHeaderViewProps> = ({ format, height, width }) => {
   const contextValue = useSchedulerContext();
 
-  const renderHeader = (head: SchedulerHeader, locale: typeof moment, headerFormat?: string) => {
+  const renderHeader = (head: XAxisHeader, locale: typeof moment, headerFormat?: string) => {
     return headerFormat
       ? headerFormat
           .split('\n')
@@ -25,7 +25,7 @@ const DataHeaderView: React.FC<DataHeaderViewProps> = ({ format, height, width }
 
   if (contextValue.styles && contextValue.source) {
     const { headers, cellUnit, localeMoment } = contextValue.source;
-    const minuteStepsInHour = contextValue.source.getMinuteStepsInHour();
+    const minuteStepsInHour = 1;
 
     return (
       <table className="rss_data_header_table">

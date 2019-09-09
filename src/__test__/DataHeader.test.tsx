@@ -2,7 +2,7 @@ import React from 'react';
 import { mount, shallow } from 'enzyme';
 import DataHeaderView from '../DataHeaderView';
 import * as OurContext from '../SchedulerContext';
-import { ViewTypes } from '../enum';
+import { TimePeriods } from '../enum';
 import DemoData from './DemoData';
 import { SchedulerDataManger } from '../SchedulerDataManager';
 
@@ -19,7 +19,7 @@ describe('DataHeaderView with SchedulerContext', () => {
   it('it should mock with context', () => {
     const schedulerData = new SchedulerDataManger({
       currentDate: '2017-12-18',
-      viewType: ViewTypes.Week,
+      viewType: TimePeriods.Week,
       resources: DemoData.resources,
       events: DemoData.events,
       language: 'th',
@@ -36,7 +36,7 @@ describe('DataHeaderView with SchedulerContext', () => {
   it('it should rendered header 7 times', () => {
     const schedulerData = new SchedulerDataManger({
       currentDate: '2017-12-18',
-      viewType: ViewTypes.Week,
+      viewType: TimePeriods.Week,
       resources: DemoData.resources,
       events: DemoData.events,
       language: 'th',

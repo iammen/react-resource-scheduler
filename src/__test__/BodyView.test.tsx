@@ -2,7 +2,7 @@ import React from 'react';
 import { mount, shallow } from 'enzyme';
 import BodyView from '../BodyView';
 import * as AppContext from '../SchedulerContext';
-import { ViewTypes } from '../enum';
+import { TimePeriods } from '../enum';
 import DemoData from './DemoData';
 import { SchedulerDataManger } from '../SchedulerDataManager';
 
@@ -18,7 +18,7 @@ describe('<BodyView />', () => {
   it('it should mock with context', () => {
     const schedulerData = new SchedulerDataManger({
       currentDate: '2017-12-18',
-      viewType: ViewTypes.Week,
+      viewType: TimePeriods.Week,
       resources: DemoData.resources,
       events: DemoData.events,
       language: 'th',

@@ -2,8 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import Scheduler from '../src/Scheduler';
 import DemoData from '../src/__test__/DemoData';
-import { SchedulerData } from '../src/ScdulerData';
-import { ViewTypes } from '../src/enum';
+import { TimePeriods } from '../src/enum';
 import { SchedulerDataManger } from '../src/SchedulerDataManager';
 
 interface Props {
@@ -11,15 +10,6 @@ interface Props {
 }
 
 export default class Basic extends React.Component<Props, {}> {
-  constructor(props: Props) {
-    super(props);
-
-    const schedulerData = new SchedulerData('2017-12-18', ViewTypes.Week);
-    schedulerData.localeMoment.locale('en');
-    schedulerData.setResources(DemoData.resources);
-    schedulerData.setEvents(DemoData.events);
-  }
-
   onSelectDate = (schedulerData: SchedulerDataManger, date: moment.Moment) => {
     schedulerData.setDate(date);
     schedulerData.setEvents(DemoData.events);
@@ -34,7 +24,7 @@ export default class Basic extends React.Component<Props, {}> {
     schedulerContent: React.RefObject<HTMLDivElement>,
     maxScrollLeft: number,
   ) => {
-    if (schedulerData.viewType === ViewTypes.Day) {
+    if (schedulerData.timePeriod === TimePeriods.Day) {
       schedulerData.setEvents(DemoData.events);
       if (schedulerContent.current) {
         schedulerContent.current.scrollLeft = maxScrollLeft - 10;
@@ -47,7 +37,7 @@ export default class Basic extends React.Component<Props, {}> {
     schedulerContent: React.RefObject<HTMLDivElement>,
     maxScrollLeft: number,
   ) => {
-    if (schedulerData.viewType === ViewTypes.Day) {
+    if (schedulerData.timePeriod === TimePeriods.Day) {
       // schedulerData.prev();
       schedulerData.setEvents(DemoData.events);
 
@@ -81,7 +71,7 @@ export default class Basic extends React.Component<Props, {}> {
           currentDate="2017-12-18"
           events={DemoData.events}
           resources={DemoData.resources}
-          viewType="day"
+          timePeriod="day"
           onSelectDate={this.onSelectDate}
           onScrollLeft={this.onScrollLeft}
           onScrollRight={this.onScrollRight}

@@ -1,97 +1,49 @@
-import { ViewTypes, SummaryPositions } from './enum';
+import { TimePeriods, SummaryPositions } from './enum';
 import { SchedulerDataConfig, View } from './interface';
 
 export const DATE_FORMAT = 'YYYY-MM-DD';
 export const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
-export const DEFAULT_VIEW_TYPES = [
-  { text: 'Day', viewType: ViewTypes.Day, showAgenda: false, isEventPerspective: false },
-  { text: 'Week', viewType: ViewTypes.Week, showAgenda: false, isEventPerspective: false },
-  { text: 'Month', viewType: ViewTypes.Month, showAgenda: false, isEventPerspective: false },
+export const VIEW_MODES = [
+  { text: 'Day', mode: TimePeriods.Day, showAgenda: false, isEventPerspective: false },
+  { text: 'Week', mode: TimePeriods.Week, showAgenda: false, isEventPerspective: false },
+  { text: 'Month', mode: TimePeriods.Month, showAgenda: false, isEventPerspective: false },
   {
     text: 'Quarter',
-    viewType: ViewTypes.Quarter,
+    mode: TimePeriods.Quarter,
     showAgenda: false,
     isEventPerspective: false,
   },
-  { text: 'Year', viewType: ViewTypes.Year, showAgenda: false, isEventPerspective: false },
+  { text: 'Year', mode: TimePeriods.Year, showAgenda: false, isEventPerspective: false },
 ] as View[];
 
 export default {
-  schedulerWidth: '100%',
-  schedulerMaxHeight: 0,
-
+  addMorePopoverHeaderFormat: 'MMM D, YYYY dddd',
   agendaMaxEventWidth: 100,
-
-  dayResourceTableWidth: 160,
-  weekResourceTableWidth: '16%',
-  monthResourceTableWidth: 160,
-  quarterResourceTableWidth: 160,
-  yearResourceTableWidth: 160,
-  customResourceTableWidth: 160,
-
-  dayCellWidth: 30,
-  weekCellWidth: '12%',
-  monthCellWidth: 80,
-  quarterCellWidth: 80,
-  yearCellWidth: 80,
-  customCellWidth: 80,
-
-  dayMaxEvents: 99,
-  weekMaxEvents: 99,
-  monthMaxEvents: 99,
-  quarterMaxEvents: 99,
-  yearMaxEvents: 99,
-  customMaxEvents: 99,
-
-  eventItemHeight: 22,
-  eventItemLineHeight: 24,
-  nonAgendaSlotMinHeight: 0,
-  dayStartFrom: 0,
-  dayStopTo: 23,
-  defaultEventBgColor: '#80C5F6',
-  selectedAreaColor: '#7EC2F3',
-  nonWorkingTimeHeadColor: '#999999',
-  nonWorkingTimeHeadBgColor: '#fff0f6',
-  nonWorkingTimeBodyBgColor: '#fff0f6',
-  summaryColor: '#666',
-  summaryPosition: SummaryPositions.TopRight,
-  groupOnlySlotColor: '#F8F8F8',
-
-  startResizable: true,
-  endResizable: true,
-  movable: true,
+  agendaViewHeader: 'Agenda',
+  calendarPopoverEnabled: true,
+  checkConflict: false,
   creatable: true,
   crossResourceMove: true,
-  checkConflict: false,
-  scrollToSpecialMomentEnabled: true,
-  eventItemPopoverEnabled: true,
-  calendarPopoverEnabled: true,
-  recurringEventsEnabled: true,
-  headerEnabled: true,
-  displayWeekend: true,
-  relativeMove: true,
+  dayStartFrom: 0,
+  dayStopTo: 23,
   defaultExpanded: true,
-
-  resourceName: 'Resource Name',
-  taskName: 'Task Name',
-  agendaViewHeader: 'Agenda',
-  addMorePopoverHeaderFormat: 'MMM D, YYYY dddd',
+  defaultDataUnitLength: 20,
+  endResizable: true,
+  eventItemHeight: 22,
+  eventItemLineHeight: 24,
   eventItemPopoverDateFormat: 'MMM D',
+  eventItemPopoverEnabled: true,
+  maxEvents: 99,
+  minuteStep: 30,
+  movable: true,
   nonAgendaDayCellHeaderFormat: 'ha',
   nonAgendaOtherCellHeaderFormat: 'ddd M/D',
-
-  minuteStep: 30,
-
-  views: [
-    { text: 'Day', viewType: ViewTypes.Day, showAgenda: false, isEventPerspective: false },
-    { text: 'Week', viewType: ViewTypes.Week, showAgenda: false, isEventPerspective: false },
-    { text: 'Month', viewType: ViewTypes.Month, showAgenda: false, isEventPerspective: false },
-    {
-      text: 'Quarter',
-      viewType: ViewTypes.Quarter,
-      showAgenda: false,
-      isEventPerspective: false,
-    },
-    { text: 'Year', viewType: ViewTypes.Year, showAgenda: false, isEventPerspective: false },
-  ] as View[],
+  nonAgendaSlotMinHeight: 0,
+  recurringEventsEnabled: true,
+  relativeMove: true,
+  resourceName: 'Resource Name',
+  scrollToSpecialMomentEnabled: true,
+  showNavigator: true,
+  summaryPosition: SummaryPositions.TopRight,
+  taskName: 'Task Name',
 } as SchedulerDataConfig;
