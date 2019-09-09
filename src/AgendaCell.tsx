@@ -8,7 +8,7 @@ import { Event } from './interface';
 import { useSchedulerContext } from './SchedulerContext';
 
 export interface AgendaCellProps {
-  defaultValue: Event;
+  defaultValue: any;
   isEnd: boolean;
   isStart: boolean;
 }

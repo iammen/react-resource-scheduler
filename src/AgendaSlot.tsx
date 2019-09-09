@@ -34,15 +34,15 @@ export default class AgendaSlot extends Component<AgendaSlotProps, {}> {
           cell.renderedEvents.forEach(renderedEvent => {
             const durationStart = localeMoment(startDate);
             const durationEnd = localeMoment(endDate).add(1, 'days');
-            const eventStart = localeMoment(renderedEvent.event.start);
-            const eventEnd = localeMoment(renderedEvent.event.end);
+            const eventStart = localeMoment(renderedEvent.startTime);
+            const eventEnd = localeMoment(renderedEvent.endTime);
             const isStart = eventStart >= durationStart;
             const isEnd = eventEnd < durationEnd;
 
             return (
               <AgendaCell
-                key={renderedEvent.event.id}
-                defaultValue={renderedEvent.event}
+                key={renderedEvent.id}
+                defaultValue={renderedEvent}
                 isStart={isStart}
                 isEnd={isEnd}
               />

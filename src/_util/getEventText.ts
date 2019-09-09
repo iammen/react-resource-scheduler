@@ -1,8 +1,9 @@
 import { Event } from '../interface';
-import { SchedulerDataManger } from '../SchedulerDataManager';
+import { SchedulerDataManger, YAxisDataType } from '../SchedulerDataManager';
+import { YAxisDataTypes } from '../enum';
 
 export const getEventText = (schedulerData: SchedulerDataManger, event: Event) => {
-  if (!schedulerData.isEventPerspective) {
+  if (schedulerData.yAxisDataType === YAxisDataTypes.Event) {
     return event.text;
   }
 

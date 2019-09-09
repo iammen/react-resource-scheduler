@@ -10,21 +10,21 @@ const BodyView: React.FC<BodyViewProps> = ({ width }) => {
   const contextValue = useSchedulerContext();
 
   if (contextValue.source) {
-    const { headers } = contextValue.source;
+    const { xAxis } = contextValue.source;
 
     return (
       <tbody>
-        {contextValue.source.slots
-          .filter(s => s.render)
-          .map(slot => {
+        {contextValue.source.yAxis
+          .filter(y => y.render)
+          .map(y => {
             return (
-              <tr key={slot.id} style={{ height: slot.height }}>
-                {headers.map((header, index) => {
+              <tr key={y.id} style={{ height: y.height }}>
+                {xAxis.map((x, index) => {
                   return (
                     <td
-                      key={`${slot.id}_${header.time}`}
-                      className={header.workingTime ? 'bg-normal' : 'bg-highlight'}
-                      style={index === headers.length - 1 ? {} : { width }}
+                      key={`${y.id}_${index}`}
+                      className={x.workingTime ? 'bg-normal' : 'bg-highlight'}
+                      style={{ width: x.length }}
                     >
                       <div></div>
                     </td>

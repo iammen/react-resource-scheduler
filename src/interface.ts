@@ -1,3 +1,5 @@
+export type ID = number | string;
+
 export interface Cell {
   workingTime: boolean;
   time: string;
@@ -23,18 +25,20 @@ export interface CustomSchedulerDate {
 }
 
 export interface Event {
-  id: number | string;
+  id: ID;
+  bgColor?: string;
+  end: string;
   groupId: number;
   groupName: string;
-  start: string;
-  end: string;
-  resourceId: string;
-  text: string;
-  bgColor?: string;
-  rrule?: string;
+  length: number;
+  recurringEventEnd?: string;
   recurringEventId?: number | string;
   recurringEventStart?: string;
-  recurringEventEnd?: string;
+  resourceId: ID;
+  rrule?: string;
+  start: string;
+  startPosition: number;
+  text: string;
 }
 
 export interface EventGroup {
@@ -44,13 +48,26 @@ export interface EventGroup {
 }
 
 export interface RenderedEvent {
-  event: Event;
-  render: boolean;
-  span: number;
+  id: ID;
+  bgColor?: string;
+  endTime: Date;
+  groupId: number;
+  groupName: string;
+  height: number;
+  length: number;
+  recurringEventEnd?: string;
+  recurringEventId?: number | string;
+  recurringEventStart?: string;
+  resourceId: ID;
+  rrule?: string;
+  startTime: Date;
+  startPosition: number;
+  text: string;
+  yAxisIndex: number;
 }
 
 export interface Resource {
-  id: string;
+  id: number | string;
   text: string;
 }
 
@@ -89,18 +106,6 @@ export interface SchedulerDimension {
   minimumDataUnitLength: number;
 }
 
-export interface XAxis {
-  endTime: Date;
-  startTime: Date;
-  length: number;
-  workingTime: boolean;
-}
-
-export interface XAxisHeader {
-  time: string;
-  workingTime: boolean;
-}
-
 export interface Slot {
   id: number;
   cells: Cell[];
@@ -123,10 +128,28 @@ export interface View {
   isEventPerspective: boolean;
 }
 
-export interface ViewType<T> {
-  day: T;
-  week: T;
-  month: T;
-  quarter: T;
-  year: T;
+export interface XAxis {
+  endTime: Date;
+  startTime: Date;
+  length: number;
+  workingTime: boolean;
+}
+
+export interface XAxisHeader {
+  time: string;
+  workingTime: boolean;
+}
+
+export interface YAxis {
+  id: number;
+  expanded: boolean;
+  groupOnly?: boolean;
+  hasChildren: boolean;
+  hasSummary: boolean;
+  indent: number;
+  parentId?: number;
+  relatedIds: ID[];
+  render: boolean;
+  height: number;
+  text: string;
 }

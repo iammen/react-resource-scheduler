@@ -24,3 +24,8 @@ export const ViewTypes = {
   Agenda: 'agenda',
   Timeline: 'timeline',
 };
+
+export const YAxisDataTypes = {
+  Event: 'event',
+  Resource: 'resource',
+};

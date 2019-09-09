@@ -110,7 +110,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   static defaultProps: Partial<SchedulerProps> = {
     agendaView: undefined,
     currentDate: moment().format(DATE_FORMAT),
-    dateFormat: 'ddd M/D',
+    dateFormat: `ddd\nM/D`,
     language: 'en',
     leftCustomHeader: undefined,
     locale: 'en',
@@ -364,11 +364,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     const timePeriod = e.target.value;
 
     if (this.props.onViewChange) {
-      this.props.onViewChange(this.dataManger, {
-        timePeriod,
-        showAgenda: this.props.viewType,
-        isEventPerspective: false,
-      });
+      this.props.onViewChange(this.dataManger, { timePeriod });
     }
   };
 
@@ -549,9 +545,10 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
         };
       }
 
-      const resourceName = this.dataManger.isEventPerspective
-        ? this.dataManger.config.taskName
-        : this.dataManger.config.resourceName;
+      const resourceName =
+        this.dataManger.yAxisDataType === 'resource'
+          ? this.dataManger.config.taskName
+          : this.dataManger.config.resourceName;
       schedulerBody = (
         <div>
           <div className="rss_resource_scroll" style={{ width: this.state.actualResourceWidth }}>
@@ -594,6 +591,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
               >
                 <div
                   style={{
+                    width: this.dataManger.dimensions.dataLength,
                     margin: `0px 0px -${contentScrollbarHeight}px`,
                   }}
                   ref={this.headRef}
@@ -613,7 +611,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                 </div>
               </div>
               <div
-                className="cell-body"
+                className="rss_data_body"
                 style={schedulerContentStyle}
                 ref={this.contentRef}
                 onMouseOver={this.handleContentMouseOver}
@@ -621,19 +619,19 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                 onScroll={this.handleContentScroll}
               >
                 <div
-                  style={{ width: this.dataManger.dimensions.dataLength, height: contentHeight }}
+                  style={{
+                    margin: 0,
+                    width: this.dataManger.dimensions.dataLength,
+                    height: contentHeight,
+                  }}
                 >
-                  <div className="event-container">
+                  <div className="rss_movable_container">
                     <table className="event-table">
                       <tbody>{/*resourceEventsList*/ null}</tbody>
                     </table>
                   </div>
-                  <div className="scheduler-table-container">
-                    <table
-                      className="scheduler-table"
-                      style={{ width: this.dataManger.dimensions.dataLength }}
-                      ref={this.tableBodyRef}
-                    >
+                  <div className="rss_yaxis_container">
+                    <table className="rss_yaxis_table" ref={this.tableBodyRef}>
                       <BodyView width={this.dataManger.dimensions.dataLength} />
                     </table>
                   </div>

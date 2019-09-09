@@ -2,11 +2,11 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import Icon from 'antd/lib/icon';
 import { useSchedulerContext } from './SchedulerContext';
-import { Slot } from './interface';
+import { YAxis } from './interface';
 
 export interface ResourceViewProps {
   scrollbarHeight: number;
-  onSlotClick?: (slot: Slot) => void;
+  onSlotClick?: (yaxis: YAxis) => void;
   toggleSlot?: (slotId: number) => void;
 }
 
@@ -22,44 +22,44 @@ const ResourceView: React.FC<ResourceViewProps> = ({
       <div style={{ paddingBottom: scrollbarHeight }}>
         <table className="rss_resource_table">
           <tbody>
-            {contextValue.source.slots
-              .filter(o => o.render)
-              .map(slot => {
+            {contextValue.source.yAxis
+              .filter(y => y.render)
+              .map(y => {
                 const indents = [];
-                for (let i = 0; i < slot.indent; i++) {
+                for (let i = 0; i < y.indent; i++) {
                   indents.push(<span key={`es${i}`} className="expander-space"></span>);
                 }
 
-                if (slot.hasChildren) {
+                if (y.hasChildren) {
                   indents.push(
-                    slot.expanded ? (
+                    y.expanded ? (
                       <Icon
                         type="minus-square"
-                        key={`es${slot.indent}`}
+                        key={`es${y.indent}`}
                         style={{}}
                         className=""
                         onClick={() => {
                           if (toggleSlot) {
-                            toggleSlot(slot.id);
+                            toggleSlot(y.id);
                           }
                         }}
                       />
                     ) : (
                       <Icon
                         type="plus-square"
-                        key={`es${slot.indent}`}
+                        key={`es${y.indent}`}
                         style={{}}
                         className=""
                         onClick={() => {
                           if (toggleSlot) {
-                            toggleSlot(slot.id);
+                            toggleSlot(y.id);
                           }
                         }}
                       />
                     ),
                   );
                 } else {
-                  indents.push(<span key={`es${slot.indent}`} className="expander-space"></span>);
+                  indents.push(<span key={`es${y.indent}`} className="expander-space"></span>);
                 }
 
                 const slotText = onSlotClick ? (
@@ -68,24 +68,24 @@ const ResourceView: React.FC<ResourceViewProps> = ({
                     <a
                       className="slot-text"
                       onClick={() => {
-                        onSlotClick(slot);
+                        onSlotClick(y);
                       }}
                     >
-                      {slot.text}
+                      {y.text}
                     </a>
                   </span>
                 ) : (
                   <span className="slot-cell">
                     {indents}
-                    <span className="slot-text">{slot.text}</span>
+                    <span className="slot-text">{y.text}</span>
                   </span>
                 );
 
                 return (
-                  <tr key={slot.id} style={{ height: slot.height }}>
-                    <td data-resource-id={slot.id}>
+                  <tr key={y.id} style={{ height: y.height }}>
+                    <td data-resource-id={y.id}>
                       <div
-                        title={slot.text}
+                        title={y.text}
                         className="overflow-text header2-text"
                         style={{ textAlign: 'left' }}
                       >

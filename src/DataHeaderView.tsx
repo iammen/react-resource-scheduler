@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { CellUnits } from './enum';
 import { useSchedulerContext } from './SchedulerContext';
 import moment from 'moment';
-import { XAxisHeader } from './interface';
+import { XAxis } from './interface';
 
 export interface DataHeaderViewProps {
   format?: string;
@@ -14,54 +14,34 @@ export interface DataHeaderViewProps {
 const DataHeaderView: React.FC<DataHeaderViewProps> = ({ format, height, width }) => {
   const contextValue = useSchedulerContext();
 
-  const renderHeader = (head: XAxisHeader, locale: typeof moment, headerFormat?: string) => {
+  const renderHeader = (x: XAxis, locale: typeof moment, headerFormat?: string) => {
     return headerFormat
       ? headerFormat
           .split('\n')
-          .map(f => locale(head.time).format(f))
+          .map(f => locale(x.startTime).format(f))
           .map((text, i) => <div key={i}>{text}</div>)
       : [];
   };
 
   if (contextValue.styles && contextValue.source) {
-    const { headers, cellUnit, localeMoment } = contextValue.source;
+    const { xAxis, localeMoment } = contextValue.source;
     const minuteStepsInHour = 1;
 
     return (
       <table className="rss_data_header_table">
         <thead>
           <tr style={{ height }}>
-            {cellUnit === CellUnits.Hour
-              ? headers.map((header, index) => {
-                  if (index % minuteStepsInHour === 0) {
-                    return (
-                      <th
-                        key={header.time}
-                        className={`header-text ${
-                          header.workingTime ? 'bg-normal' : 'bg-highlight'
-                        }`}
-                        style={
-                          index === headers.length - minuteStepsInHour
-                            ? {}
-                            : { width: width * minuteStepsInHour }
-                        }
-                      >
-                        <div>{renderHeader(header, localeMoment, format)}</div>
-                      </th>
-                    );
-                  }
-                })
-              : headers.map((header, index) => {
-                  return (
-                    <th
-                      key={header.time}
-                      className={`header-text ${header.workingTime ? 'bg-normal' : 'bg-highlight'}`}
-                      style={index === headers.length - 1 ? {} : { width }}
-                    >
-                      <div>{renderHeader(header, localeMoment, format)}</div>
-                    </th>
-                  );
-                })}
+            {xAxis.map((x, index) => {
+              return (
+                <th
+                  key={index}
+                  className={`header-text ${x.workingTime ? 'bg-normal' : 'bg-highlight'}`}
+                  style={x.length > 0 ? { width: x.length } : {}}
+                >
+                  <div>{renderHeader(x, localeMoment, format)}</div>
+                </th>
+              );
+            })}
           </tr>
         </thead>
       </table>
