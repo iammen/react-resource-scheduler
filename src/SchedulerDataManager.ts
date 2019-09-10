@@ -95,7 +95,6 @@ export class SchedulerDataManger {
 
   // Height per slot.
   private yAxisHeight: number;
-  private yAxisMaxHeight: number;
 
   constructor(args: Partial<InitProps>) {
     this.resources = args.resources || [];
@@ -122,7 +121,6 @@ export class SchedulerDataManger {
     this.endTimeOfDay = 23;
     this.minuteStep = args.minuteStep || 60;
     this.yAxisHeight = 40;
-    this.yAxisMaxHeight = 200;
     this.eventHeight = 30;
 
     this.dimensions = {
@@ -382,7 +380,7 @@ export class SchedulerDataManger {
     });
   }
 
-  private generateTimelineXAxis() {
+  private generateTimeSlotXaxis() {
     const start = this.localeMoment(this.startDate.toDate());
     const end = this.localeMoment(this.endDate.toDate());
 
@@ -436,7 +434,7 @@ export class SchedulerDataManger {
         workingTime: false,
       });
     } else if (this.viewType === ViewTypes.Timeline) {
-      this.generateTimelineXAxis();
+      this.generateTimeSlotXaxis();
     }
   }
 
@@ -612,40 +610,6 @@ export class SchedulerDataManger {
     });
   }
 
-  private initializeCell(header: XAxisHeader) {
-    const startDt = this.localeMoment(header.time);
-    const startTime = startDt.format(DATETIME_FORMAT);
-    const endTime =
-      this.viewType === 'timeline'
-        ? this.timePeriod === TimePeriods.Week
-          ? startDt.add(1, 'weeks').format(DATETIME_FORMAT)
-          : this.timePeriod === TimePeriods.Day
-          ? startDt.add(1, 'days').format(DATETIME_FORMAT)
-          : this.timePeriod === TimePeriods.Month
-          ? startDt.add(1, 'months').format(DATETIME_FORMAT)
-          : this.timePeriod === TimePeriods.Year
-          ? startDt.add(1, 'years').format(DATETIME_FORMAT)
-          : this.timePeriod === TimePeriods.Quarter
-          ? startDt.add(1, 'quarters').format(DATETIME_FORMAT)
-          : this.localeMoment(this.endDate)
-              .add(1, 'days')
-              .format(DATETIME_FORMAT)
-        : this.cellUnit === CellUnits.Hour
-        ? startDt.add(this.minuteStep, 'minutes').format(DATETIME_FORMAT)
-        : startDt.add(1, 'days').format(DATETIME_FORMAT);
-
-    return {
-      time: header.time,
-      workingTime: header.workingTime,
-      startTime,
-      endTime,
-      eventCount: 0,
-      addMore: 0,
-      addMoreIndex: 0,
-      renderedEvents: [],
-    } as Cell;
-  }
-
   private recalDataHeight() {
     this.dimensions.dataHeight = 0;
     this.yAxis.forEach(y => {
@@ -741,9 +705,7 @@ export class SchedulerDataManger {
           y.height = y.relatedIds.length * this.eventHeight;
         }
 
-        if (y.height > this.yAxisMaxHeight) {
-          y.height = this.yAxisMaxHeight;
-        } else if (y.height < this.yAxisHeight) {
+        if (y.height < this.yAxisHeight) {
           y.height = this.yAxisHeight;
         }
       });
@@ -757,6 +719,7 @@ export class SchedulerDataManger {
     this.recalYAxisLength();
     this.recalDataHeight();
     this.generateRenderedEvents();
+    this.recalRenderedEventLength();
   }
 
   private resolveDateRange(date: moment.Moment) {

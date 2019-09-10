@@ -9,7 +9,6 @@ describe('<ResourceView />', () => {
   const styles = {
     cellWidth: 40,
     headerHeight: 40,
-    rowMaxHeight: 0,
     rowHeight: 40,
   };
 
@@ -27,7 +26,7 @@ describe('<ResourceView />', () => {
     };
 
     jest.spyOn(AppContext, 'useSchedulerContext').mockImplementation(() => contextValue);
-    const wrapper = shallow(<ResourceView scrollbarHeight={24} />);
+    const wrapper = shallow(<ResourceView headerHeight={24} width={1024} />);
     expect(wrapper.find('.rss_resource_table')).toBeDefined();
   });
 });

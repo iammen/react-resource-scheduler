@@ -10,7 +10,6 @@ describe('DataHeaderView with SchedulerContext', () => {
   const styles = {
     cellWidth: 40,
     headerHeight: 40,
-    rowMaxHeight: 0,
     rowHeight: 40,
   };
 
@@ -42,7 +41,7 @@ describe('DataHeaderView with SchedulerContext', () => {
     });
     const TestWithContextComp = () => {
       return (
-        <OurContext.SchedulerContext.Provider value={{ styles, source: schedulerData.getSource() }}>
+        <OurContext.SchedulerContext.Provider value={{ source: schedulerData.getSource() }}>
           <DataHeaderView width={1024} height={800} />
         </OurContext.SchedulerContext.Provider>
       );

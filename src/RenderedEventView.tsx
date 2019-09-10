@@ -1,14 +1,14 @@
 import React, { useContext } from 'react';
+import PropTypes from 'prop-types';
 import { SchedulerContext } from './SchedulerContext';
-import { DATETIME_FORMAT } from './constants';
 
-export const RenderedEventView: React.FC<{}> = () => {
+const RenderedEventView: React.FC<{}> = () => {
   const contextValue = useContext(SchedulerContext);
 
   if (contextValue.source) {
     const { source } = contextValue;
     return (
-      <table className="rss_event_table">
+      <table className="rss_event_table" cellSpacing={0} cellPadding={0}>
         <tbody>
           {source.yAxis
             .filter(y => y.render)
@@ -20,7 +20,7 @@ export const RenderedEventView: React.FC<{}> = () => {
                       style={{
                         position: 'relative',
                         height: y.height,
-                        width: source.dimensions.dataLength - 1,
+                        width: '100%',
                       }}
                     >
                       {y.relatedIds.map(resourceId => {
@@ -64,3 +64,5 @@ export const RenderedEventView: React.FC<{}> = () => {
     return null;
   }
 };
+
+export default RenderedEventView;

@@ -8,7 +8,7 @@ export interface TimePeriodSelectorProps {
   onChange?: (e: RadioChangeEvent) => void;
 }
 
-export const TimePeriodSelector: React.FC<TimePeriodSelectorProps> = ({ value, onChange }) => {
+const TimePeriodSelector: React.FC<TimePeriodSelectorProps> = ({ value, onChange }) => {
   return (
     <Radio.Group value={value} size="default" onChange={onChange}>
       {VIEW_MODES.map(item => {
@@ -21,3 +21,5 @@ export const TimePeriodSelector: React.FC<TimePeriodSelectorProps> = ({ value, o
     </Radio.Group>
   );
 };
+
+export default TimePeriodSelector;

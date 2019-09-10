@@ -27,7 +27,7 @@ export default {
   dayStartFrom: 0,
   dayStopTo: 23,
   defaultExpanded: true,
-  defaultDataUnitLength: 20,
+  defaultDataUnitLength: 35,
   endResizable: true,
   eventItemHeight: 22,
   eventItemLineHeight: 24,

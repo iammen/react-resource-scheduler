@@ -12,8 +12,8 @@ import BodyView from './BodyView';
 import DataHeaderView from './DataHeaderView';
 import ResourceView from './ResourceView';
 import AgendaView from './AgendaView';
-import { RenderedEventView } from './RenderedEventView';
-import { TimePeriodSelector } from './TimePeriodSelector';
+import RenderedEventView from './RenderedEventView';
+import TimePeriodSelector from './TimePeriodSelector';
 
 import 'antd/lib/select/style/index.css';
 import 'antd/lib/grid/style/index.css';
@@ -45,7 +45,6 @@ export interface SchedulerProps {
   resourceWidth: number | string;
   resources: Resource[];
   rightCustomHeader: React.ReactNode;
-  rowMaxHeight: number;
   timeFormat: string;
   timePeriod: TimePeriod;
   viewType: ViewType;
@@ -88,9 +87,8 @@ export interface SchedulerProps {
 }
 
 interface SchedulerStates {
-  actualResourceWidth: number;
-  actualSchedulerWidth: number;
-  availableCellWidth: number;
+  resourceWidth: number;
+  schedulerWidth: number;
   contentScrollbarHeight: number;
   contentScrollbarWidth: number;
   dndContext?: any;
@@ -98,7 +96,6 @@ interface SchedulerStates {
   resourceScrollbarWidth: number;
   scrollLeft: number;
   scrollTop: number;
-  source: SchedulerSource;
   visible: boolean;
 }
 
@@ -114,7 +111,6 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     locale: 'en',
     resourceWidth: 240,
     rightCustomHeader: undefined,
-    rowMaxHeight: 768,
     timeFormat: 'ha',
     timePeriod: 'week',
     viewType: 'timeline',
@@ -129,7 +125,6 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     headerHeight: PropTypes.number,
     leftCustomHeader: PropTypes.node,
     rightCustomHeader: PropTypes.node,
-    rowMaxHeight: PropTypes.number,
     styles: PropTypes.object,
     timeFormat: PropTypes.string,
     timePeriod: PropTypes.string,
@@ -148,6 +143,8 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   resourceRef: RefObject<HTMLDivElement>;
 
   selfRef: RefObject<HTMLDivElement>;
+
+  source: SchedulerSource;
 
   constructor(props: SchedulerProps) {
     super(props);
@@ -172,11 +169,11 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
       events: props.events,
       resources: props.resources,
     });
+    this.source = this.dataManger.getSource();
 
     this.state = {
-      actualResourceWidth: 0,
-      actualSchedulerWidth: 0,
-      availableCellWidth: 0,
+      resourceWidth: 0,
+      schedulerWidth: 0,
       contentScrollbarHeight: 17,
       contentScrollbarWidth: 17,
       dndContext: undefined,
@@ -184,7 +181,6 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
       resourceScrollbarWidth: 17,
       scrollLeft: 0,
       scrollTop: 0,
-      source: this.dataManger.getSource(),
       visible: false,
     };
 
@@ -355,8 +351,11 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   handleTimePeriodChange = (e: RadioChangeEvent) => {
     const timePeriod = e.target.value;
     this.dataManger.setTimePeriod(timePeriod);
-    const source = this.dataManger.getSource();
-    this.setState({ source });
+    this.source = this.dataManger.getSource();
+
+    if (this.props.onTimePeriodChange) {
+      this.props.onTimePeriodChange(timePeriod);
+    }
   };
 
   handleVisibleChange = (visible: boolean) => {
@@ -421,24 +420,16 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
 
     let states = {};
     let isStateChange = false;
-    if (
-      this.selfRef.current &&
-      this.state.actualSchedulerWidth !== this.selfRef.current.clientWidth
-    ) {
-      const actualSchedulerWidth = this.selfRef.current.clientWidth;
-      const actualResourceWidth = this.resolveResourceWidth();
-      this.dataManger.recalDimensions(actualSchedulerWidth, actualResourceWidth);
-      const source = this.dataManger.getSource();
+    if (this.selfRef.current && this.state.schedulerWidth !== this.selfRef.current.clientWidth) {
+      const schedulerWidth = this.selfRef.current.clientWidth;
+      const resourceWidth = this.resolveResourceWidth();
+      this.dataManger.recalDimensions(schedulerWidth, resourceWidth);
+      this.source = this.dataManger.getSource();
 
       states = {
         ...states,
-        actualResourceWidth,
-        actualSchedulerWidth,
-        availableCellWidth:
-          actualResourceWidth + source.dimensions.dataLength > this.selfRef.current.clientWidth
-            ? this.selfRef.current.clientWidth - actualResourceWidth
-            : source.dimensions.dataLength,
-        source,
+        resourceWidth,
+        schedulerWidth,
       };
       isStateChange = true;
     }
@@ -552,7 +543,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
         maxHeight: this.props.rowMaxHeight,
       };
       let resourceContentStyle: React.CSSProperties = {
-        width: this.state.actualResourceWidth + resourceScrollbarWidth - 1,
+        width: this.state.resourceWidth + resourceScrollbarWidth - 1,
         margin: `0px -${contentScrollbarWidth}px 0px 0px`,
         maxHeight: this.props.rowMaxHeight,
       };
@@ -570,7 +561,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     }
 
     return (
-      <SchedulerContext.Provider value={{ source: this.state.source }}>
+      <SchedulerContext.Provider value={{ source: this.source }}>
         <div
           ref={this.selfRef}
           id="rss_root"
@@ -581,14 +572,14 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
             {config.showNavigator ? this.renderHeaderNavigator() : null}
           </div>
           <div className="rss_scheduler">
-            <div className="rss_resource_scroll" style={{ width: this.state.actualResourceWidth }}>
+            <div className="rss_resource_scroll" style={{ width: this.state.resourceWidth }}>
               <ResourceView
                 text="Resource Name"
                 headerHeight={this.props.headerHeight}
-                width={this.state.source.dimensions.resourceLength}
+                width={this.source.dimensions.resourceLength}
               />
             </div>
-            <div className="rss_data_scroll" style={{ width: this.state.availableCellWidth }}>
+            <div className="rss_data_scroll" style={{ width: this.source.dimensions.dataLength }}>
               <DataView
                 headerFormat={
                   this.props.timePeriod === TimePeriods.Day
@@ -596,7 +587,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                     : this.props.dateFormat
                 }
                 headerHeight={this.props.headerHeight}
-                width={this.state.source.dimensions.dataLength - 1}
+                width={this.source.dimensions.dataLength}
               />
             </div>
           </div>

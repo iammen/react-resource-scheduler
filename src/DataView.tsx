@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import { useSchedulerContext } from './SchedulerContext';
 import { XAxis, YAxis } from './interface';
-import { RenderedEventView } from './RenderedEventView';
+import RenderedEventView from './RenderedEventView';
 
 export interface DataViewProps {
   headerFormat: string;
@@ -33,7 +33,7 @@ const DataView: React.FC<DataViewProps> = ({ headerHeight, headerFormat, width }
               className={x.workingTime ? 'bg-normal' : 'bg-highlight'}
               style={x.length > 0 ? { width: x.length } : {}}
             >
-              <div></div>
+              <></>
             </td>
           );
         })}
@@ -42,11 +42,15 @@ const DataView: React.FC<DataViewProps> = ({ headerHeight, headerFormat, width }
   };
 
   if (contextValue.source) {
-    const { localeMoment, xAxis } = contextValue.source;
+    const { dimensions, localeMoment, xAxis } = contextValue.source;
+    const style: React.CSSProperties =
+      dimensions.dataUnitLength * xAxis.length > width
+        ? { paddingBottom: 10 }
+        : { paddingBottom: 0 };
 
     return (
-      <div className="rss_data_container" style={{ width }}>
-        <table className="rss_data_table">
+      <div className="rss_data_container" style={{ ...style, width }}>
+        <table className="rss_data_table" cellSpacing={0} cellPadding={0}>
           <thead>
             <tr style={{ height: headerHeight }}>
               {xAxis.map((x, index) => {
@@ -66,7 +70,7 @@ const DataView: React.FC<DataViewProps> = ({ headerHeight, headerFormat, width }
             {contextValue.source.yAxis.filter(y => y.render).map(y => renderBody(xAxis, y))}
           </tbody>
         </table>
-        <div style={{ position: 'absolute', top: headerHeight, width: '100%' }}>
+        <div style={{ position: 'absolute', top: headerHeight }}>
           <RenderedEventView />
         </div>
       </div>

@@ -9,7 +9,6 @@ describe('<AgendaView />', () => {
   const styles = {
     cellWidth: 40,
     headerHeight: 40,
-    rowMaxHeight: 0,
     rowHeight: 40,
   };
 

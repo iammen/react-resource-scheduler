@@ -77,6 +77,7 @@ export default class Basic extends React.Component<Props, States> {
           onScrollRight={this.onScrollRight}
           onScrollTop={this.onScrollTop}
           onScrollBottom={this.onScrollBottom}
+          onTimePeriodChange={this.onTimePeriodChange}
         />
       </div>
     );
