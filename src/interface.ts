@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export type ID = number | string;
 
 export interface Cell {
@@ -101,10 +103,19 @@ export interface SchedulerDataConfig {
 
 export interface SchedulerDimension {
   containerLength: number;
-  resourceLength: number;
+  dataHeight: number;
   dataLength: number;
   dataUnitLength: number;
   minimumDataUnitLength: number;
+  resourceLength: number;
+}
+
+export interface SchedulerSource {
+  dimensions: SchedulerDimension;
+  localeMoment: typeof moment;
+  renderedEvents: RenderedEvent[];
+  xAxis: XAxis[];
+  yAxis: YAxis[];
 }
 
 export interface Slot {

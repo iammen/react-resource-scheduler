@@ -23,10 +23,6 @@
       border-left: 1px solid #e9e9e9;
       border-top: 1px solid #e9e9e9;
       overflow: hidden;
-      .rss_resource_header {
-        overflow: hidden;
-        border-bottom: 1px solid #e9e9e9;
-      }
     }
   }
 
@@ -43,6 +39,7 @@
     position: relative;
     border-left: 1px solid #e9e9e9;
     border-top: 1px solid #e9e9e9;
+    border-bottom: 1px solid #e9e9e9;
     margin: 0 0 0 -1px;
     padding: 0;
     vertical-align: top;
@@ -53,6 +50,7 @@
       overflow: hidden;
       border-bottom: 1px solid #e9e9e9;
     }
+
     .rss_data_header_table {
       overflow-x: hidden;
       overflow-y: hidden;
@@ -74,24 +72,61 @@
     }
 
     .rss_movable_container {
-      position: relative;
-      z-index: 2;
-      table.event-table {
-        margin: 0;
-        padding: 0;
-        border: 0 solid #e9e9e9;
-        border-spacing: 0;
-      }
-    }
-
-    .scheduler-content {
-      position: relative;
-      z-index: 2;
+      position: absolute;
+      width: 100%;
     }
   }
 
-  table.rss_resource_table,
-  table.rss_yaxis_table,
+  table.rss_event_table {
+    table-layout: fixed;
+    z-index: 2;
+    margin: 0;
+    padding: 0;
+    border: 0 solid #e9e9e9;
+    border-spacing: 0;
+  }
+
+  table.rss_data_table,
+  table.rss_resource_table {
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border-spacing: 0;
+    text-align: center;
+    overflow-y: auto;
+    th,
+    td {
+      border-right: 1px solid #e9e9e9;
+      border-bottom: 1px solid #e9e9e9;
+    }
+    tr th:last-child,
+    tr td:last-child {
+      border-right: 0;
+    }
+    tr:last-child td {
+      border-bottom: 0;
+    }
+    .header-text {
+      font-size: 12px;
+      font-weight: 500;
+    }
+    & .bg-normal {
+      background-color: #fff;
+    }
+    & .bg-highlight {
+      color: #999999;
+      background-color: #fff0f6;
+    }
+  }
+
+  table.rss_resource_table {
+    tr:last-child td {
+      border-bottom: 1px solid #e9e9e9;
+    }
+  }
+
+  table.rss_axis_table,
   table.rss_data_header_table {
     width: 100%;
     margin: 0;
@@ -111,33 +146,28 @@
     }
   }
 
-  table.rss_resource_table tr,
-  table.rss_yaxis_table tr,
+  table.rss_axis_table tr,
   table.rss_data_header_table tr {
     border-bottom: 1px solid #e9e9e9;
   }
 
-  table.rss_resource_table th,
-  table.rss_yaxis_table th,
+  table.rss_axis_table th,
   table.rss_data_header_table th,
-  table.rss_resource_table td,
-  table.rss_yaxis_table td {
+  table.rss_axis_table td {
     border-right: 1px solid #e9e9e9;
     border-bottom: 1px solid #e9e9e9;
   }
 
-  table.rss_yaxis_table th {
+  table.rss_axis_table th {
     border-right: 1px solid #e9e9e9;
   }
 
-  table.rss_resource_table tr th:last-child,
-  table.rss_yaxis_table tr th:last-child,
-  table.rss_resource_table tr td:last-child,
-  table.rss_yaxis_table tr td:last-child {
+  table.rss_axis_table tr th:last-child,
+  table.rss_axis_table tr td:last-child {
     border-right: 0;
   }
 
-  table.rss_yaxis_table tr:last-child td {
+  table.rss_axis_table tr:last-child td {
     border-bottom: 0;
   }
 }

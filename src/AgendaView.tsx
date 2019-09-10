@@ -12,8 +12,8 @@ export interface AgendaViewProps {
 const AgendaView: React.FC<AgendaViewProps> = props => {
   const contextValue = useSchedulerContext();
 
-  if (contextValue.styles && contextValue.source) {
-    return (
+  if (contextValue.source) {
+    /*return (
       <div>
         <table className="scheduler-table">
           <thead>
@@ -31,7 +31,8 @@ const AgendaView: React.FC<AgendaViewProps> = props => {
           </tbody>
         </table>
       </div>
-    );
+    );*/
+    return null;
   } else {
     return null;
   }

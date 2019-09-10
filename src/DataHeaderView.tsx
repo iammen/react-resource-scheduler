@@ -1,6 +1,5 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { CellUnits } from './enum';
 import { useSchedulerContext } from './SchedulerContext';
 import moment from 'moment';
 import { XAxis } from './interface';
@@ -23,7 +22,7 @@ const DataHeaderView: React.FC<DataHeaderViewProps> = ({ format, height, width }
       : [];
   };
 
-  if (contextValue.styles && contextValue.source) {
+  if (contextValue.source) {
     const { xAxis, localeMoment } = contextValue.source;
     const minuteStepsInHour = 1;
 
@@ -38,7 +37,7 @@ const DataHeaderView: React.FC<DataHeaderViewProps> = ({ format, height, width }
                   className={`header-text ${x.workingTime ? 'bg-normal' : 'bg-highlight'}`}
                   style={x.length > 0 ? { width: x.length } : {}}
                 >
-                  <div>{renderHeader(x, localeMoment, format)}</div>
+                  {renderHeader(x, localeMoment, format)}
                 </th>
               );
             })}

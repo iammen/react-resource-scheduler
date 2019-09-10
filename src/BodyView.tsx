@@ -13,27 +13,29 @@ const BodyView: React.FC<BodyViewProps> = ({ width }) => {
     const { xAxis } = contextValue.source;
 
     return (
-      <tbody>
-        {contextValue.source.yAxis
-          .filter(y => y.render)
-          .map(y => {
-            return (
-              <tr key={y.id} style={{ height: y.height }}>
-                {xAxis.map((x, index) => {
-                  return (
-                    <td
-                      key={`${y.id}_${index}`}
-                      className={x.workingTime ? 'bg-normal' : 'bg-highlight'}
-                      style={{ width: x.length }}
-                    >
-                      <div></div>
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-      </tbody>
+      <table className="rss_axis_table">
+        <tbody>
+          {contextValue.source.yAxis
+            .filter(y => y.render)
+            .map(y => {
+              return (
+                <tr key={y.id} style={{ height: y.height }}>
+                  {xAxis.map((x, index) => {
+                    return (
+                      <td
+                        key={`${y.id}_${index}`}
+                        className={x.workingTime ? 'bg-normal' : 'bg-highlight'}
+                        style={x.length > 0 ? { width: x.length } : {}}
+                      >
+                        <div></div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+        </tbody>
+      </table>
     );
   } else {
     return null;

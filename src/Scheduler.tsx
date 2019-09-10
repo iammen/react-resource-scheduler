@@ -7,6 +7,7 @@ import Icon from 'antd/lib/icon';
 import { RadioChangeEvent } from 'antd/lib/radio';
 import Popover from 'antd/lib/popover';
 import Calendar from 'antd/lib/calendar';
+import DataView from './DataView';
 import BodyView from './BodyView';
 import DataHeaderView from './DataHeaderView';
 import ResourceView from './ResourceView';
@@ -22,7 +23,7 @@ import './less/style.less';
 
 import { SchedulerContext } from './SchedulerContext';
 import { getScrollSpecialMoment } from './_util/getScrollSpecialMoment';
-import { Event, Resource } from './interface';
+import { Event, Resource, SchedulerSource } from './interface';
 import { TimePeriods, ViewTypes } from './enum';
 import { SchedulerDataManger } from './SchedulerDataManager';
 import { DATE_FORMAT } from './constants';
@@ -30,30 +31,24 @@ import { DATE_FORMAT } from './constants';
 export type TimePeriod = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
 export type ViewType = 'agenda' | 'timeline' | 'day' | 'week' | 'month' | 'map';
 
-export interface Styles {
-  cellWidth: number;
-  headerHeight: number;
-  maxHeight: number;
-  slotHeaderWidth: number;
-  slotHeight: number;
-}
-
 export interface SchedulerProps {
   agendaView?: React.ReactNode;
+  cellWidth: number;
   currentDate: string;
-  viewType: ViewType;
+  dateFormat: string;
   dndSources?: [];
   events: Event[];
-  dateFormat: string;
+  headerHeight: number;
   language: string;
-  timeFormat: string;
   leftCustomHeader: React.ReactNode;
   locale: string;
-  resources: Resource[];
   resourceWidth: number | string;
+  resources: Resource[];
   rightCustomHeader: React.ReactNode;
-  styles: Styles;
+  rowMaxHeight: number;
+  timeFormat: string;
   timePeriod: TimePeriod;
+  viewType: ViewType;
   width: number | string;
 
   conflictOccurred?: () => void;
@@ -84,7 +79,7 @@ export interface SchedulerProps {
   onScrollTop?: (data: SchedulerDataManger, ref: RefObject<HTMLDivElement>, hight: number) => void;
   onSelectDate: (data: SchedulerDataManger, date: moment.Moment) => void;
   onSetAddMoreState?: () => void;
-  onViewChange?: (data: SchedulerDataManger, view: any) => void;
+  onTimePeriodChange?: (timePeriod: TimePeriod) => void;
   prevClick: (data: SchedulerDataManger) => void;
   updateEventEnd?: () => void;
   updateEventStart?: () => void;
@@ -96,7 +91,6 @@ interface SchedulerStates {
   actualResourceWidth: number;
   actualSchedulerWidth: number;
   availableCellWidth: number;
-  contentHeight: number;
   contentScrollbarHeight: number;
   contentScrollbarWidth: number;
   dndContext?: any;
@@ -104,26 +98,23 @@ interface SchedulerStates {
   resourceScrollbarWidth: number;
   scrollLeft: number;
   scrollTop: number;
+  source: SchedulerSource;
   visible: boolean;
 }
 
 export default class Scheduler extends Component<SchedulerProps, SchedulerStates> {
   static defaultProps: Partial<SchedulerProps> = {
     agendaView: undefined,
+    cellWidth: 40,
     currentDate: moment().format(DATE_FORMAT),
     dateFormat: `ddd\nM/D`,
+    headerHeight: 40,
     language: 'en',
     leftCustomHeader: undefined,
     locale: 'en',
-    resourceWidth: 200,
+    resourceWidth: 240,
     rightCustomHeader: undefined,
-    styles: {
-      cellWidth: 40,
-      headerHeight: 40,
-      maxHeight: 768,
-      slotHeaderWidth: 160,
-      slotHeight: 40,
-    },
+    rowMaxHeight: 768,
     timeFormat: 'ha',
     timePeriod: 'week',
     viewType: 'timeline',
@@ -132,13 +123,16 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
 
   static propTypes = {
     agendaView: PropTypes.node,
+    cellWidth: PropTypes.number,
     dateFormat: PropTypes.string,
-    timePeriod: PropTypes.string,
     dndSources: PropTypes.array,
+    headerHeight: PropTypes.number,
     leftCustomHeader: PropTypes.node,
     rightCustomHeader: PropTypes.node,
+    rowMaxHeight: PropTypes.number,
     styles: PropTypes.object,
     timeFormat: PropTypes.string,
+    timePeriod: PropTypes.string,
     viewType: PropTypes.string,
     width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   };
@@ -154,8 +148,6 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   resourceRef: RefObject<HTMLDivElement>;
 
   selfRef: RefObject<HTMLDivElement>;
-
-  tableBodyRef: RefObject<HTMLTableElement>;
 
   constructor(props: SchedulerProps) {
     super(props);
@@ -173,21 +165,6 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
 
     this.currentArea = -1;
 
-    this.state = {
-      actualResourceWidth: 0,
-      actualSchedulerWidth: 0,
-      availableCellWidth: 0,
-      contentHeight: 0,
-      contentScrollbarHeight: 17,
-      contentScrollbarWidth: 17,
-      dndContext: undefined,
-      resourceScrollbarHeight: 17,
-      resourceScrollbarWidth: 17,
-      scrollLeft: 0,
-      scrollTop: 0,
-      visible: false,
-    };
-
     this.dataManger = new SchedulerDataManger({
       currentDate: props.currentDate,
       language: props.language,
@@ -196,11 +173,25 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
       resources: props.resources,
     });
 
+    this.state = {
+      actualResourceWidth: 0,
+      actualSchedulerWidth: 0,
+      availableCellWidth: 0,
+      contentScrollbarHeight: 17,
+      contentScrollbarWidth: 17,
+      dndContext: undefined,
+      resourceScrollbarHeight: 17,
+      resourceScrollbarWidth: 17,
+      scrollLeft: 0,
+      scrollTop: 0,
+      source: this.dataManger.getSource(),
+      visible: false,
+    };
+
     this.contentRef = React.createRef();
     this.headRef = React.createRef();
     this.resourceRef = React.createRef();
     this.selfRef = React.createRef();
-    this.tableBodyRef = React.createRef();
 
     if (this.isResponsive()) {
       window.onresize = this.handleWindowResize;
@@ -214,7 +205,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   componentDidUpdate() {
     this.resolveScrollbarSize();
 
-    if (this.dataManger.getScrollToSpecialMoment()) {
+    /*if (this.dataManger.getScrollToSpecialMoment()) {
       if (
         this.contentRef &&
         this.contentRef.current &&
@@ -236,7 +227,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
           this.dataManger.setScrollToSpecialMoment(false);
         }
       }
-    }
+    }*/
   }
 
   goNext = () => {
@@ -361,12 +352,11 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     }
   };
 
-  handleViewChange = (e: RadioChangeEvent) => {
+  handleTimePeriodChange = (e: RadioChangeEvent) => {
     const timePeriod = e.target.value;
-
-    if (this.props.onViewChange) {
-      this.props.onViewChange(this.dataManger, { timePeriod });
-    }
+    this.dataManger.setTimePeriod(timePeriod);
+    const source = this.dataManger.getSource();
+    this.setState({ source });
   };
 
   handleVisibleChange = (visible: boolean) => {
@@ -383,17 +373,6 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
 
   isResourceResponsive() {
     return this.props.resourceWidth.toString().endsWith('%');
-  }
-
-  resolveBodyDesiredHeight() {
-    let height = 0;
-    this.dataManger.slots.forEach(slot => {
-      if (slot.render) {
-        height += slot.height;
-      }
-    });
-
-    return height;
   }
 
   resolveResourceWidth() {
@@ -425,7 +404,6 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     let contentScrollbarWidth = 17;
     let resourceScrollbarHeight = 17;
     let resourceScrollbarWidth = 17;
-    let bodyHeight = this.resolveBodyDesiredHeight();
 
     if (this.contentRef && this.contentRef.current) {
       contentScrollbarHeight =
@@ -441,10 +419,6 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
         this.resourceRef.current.offsetWidth - this.resourceRef.current.clientWidth;
     }
 
-    if (this.tableBodyRef && this.tableBodyRef.current) {
-      bodyHeight = this.tableBodyRef.current.offsetHeight;
-    }
-
     let states = {};
     let isStateChange = false;
     if (
@@ -454,16 +428,17 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
       const actualSchedulerWidth = this.selfRef.current.clientWidth;
       const actualResourceWidth = this.resolveResourceWidth();
       this.dataManger.recalDimensions(actualSchedulerWidth, actualResourceWidth);
+      const source = this.dataManger.getSource();
 
       states = {
         ...states,
         actualResourceWidth,
         actualSchedulerWidth,
         availableCellWidth:
-          actualResourceWidth + this.dataManger.dimensions.dataLength >
-          this.selfRef.current.clientWidth
+          actualResourceWidth + source.dimensions.dataLength > this.selfRef.current.clientWidth
             ? this.selfRef.current.clientWidth - actualResourceWidth
-            : this.dataManger.dimensions.dataLength,
+            : source.dimensions.dataLength,
+        source,
       };
       isStateChange = true;
     }
@@ -473,10 +448,6 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     }
     if (contentScrollbarWidth !== this.state.contentScrollbarWidth) {
       states = { ...states, contentScrollbarWidth };
-      isStateChange = true;
-    }
-    if (bodyHeight !== this.state.contentHeight) {
-      states = { ...states, contentHeight: bodyHeight };
       isStateChange = true;
     }
     if (resourceScrollbarHeight !== this.state.resourceScrollbarHeight) {
@@ -492,20 +463,72 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     }
   };
 
+  renderHeaderNavigator = () => {
+    const dateTitle = this.dataManger.getDateTitle();
+    const calendarPopoverEnabled = false;
+
+    return (
+      <Row type="flex" align="middle" justify="space-between">
+        {this.props.leftCustomHeader}
+        <Col>
+          <div className="header2-text">
+            <Icon
+              type="left"
+              style={{ marginRight: '8px' }}
+              className="icon-nav"
+              onClick={this.goBack}
+            />
+            {calendarPopoverEnabled ? (
+              <Popover
+                content={
+                  <div className="popover-calendar">
+                    <Calendar fullscreen={false} onSelect={this.handleDateSelect} />
+                  </div>
+                }
+                placement="bottom"
+                trigger="click"
+                visible={this.state.visible}
+                onVisibleChange={this.handleVisibleChange}
+              >
+                <span className={'header2-text-label'} style={{ cursor: 'pointer' }}>
+                  {dateTitle}
+                </span>
+              </Popover>
+            ) : (
+              <span className={'header2-text-label'}>{dateTitle}</span>
+            )}
+            <Icon
+              type="right"
+              style={{ marginLeft: '8px' }}
+              className="icon-nav"
+              onClick={this.goNext}
+            />
+          </div>
+        </Col>
+        <Col>
+          <TimePeriodSelector
+            value={this.props.timePeriod}
+            onChange={this.handleTimePeriodChange}
+          />
+        </Col>
+        {this.props.rightCustomHeader}
+      </Row>
+    );
+  };
+
   render() {
     const { config } = this.dataManger;
-    const calendarPopoverEnabled = config.calendarPopoverEnabled;
-    const dateTitle = this.dataManger.getDateTitle();
+    // const calendarPopoverEnabled = config.calendarPopoverEnabled;
 
     let schedulerBody: JSX.Element;
     if (this.props.viewType === ViewTypes.Agenda) {
       schedulerBody = <AgendaView {...this.props} />;
     } else {
-      // const DndResourceEvents = this.state.dndContext.getDropTarget();
-      // const eventDndSource = this.state.dndContext.getDndSource();
+      /* const DndResourceEvents = this.state.dndContext.getDropTarget();
+      / const eventDndSource = this.state.dndContext.getDndSource();
 
       const renderedEvents = this.dataManger.slots.filter(o => o.render);
-      /* const resourceEventsList = renderedEvents.map(slot => {
+      const resourceEventsList = renderedEvents.map(slot => {
       return (
         <DndResourceEvents
           {...this.props}
@@ -514,10 +537,9 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
           dndSource={eventDndSource}
         />
       );
-    }); */
+    });
 
       const {
-        contentHeight,
         contentScrollbarHeight,
         contentScrollbarWidth,
         resourceScrollbarHeight,
@@ -527,180 +549,57 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
       const contentPaddingBottom = contentScrollbarHeight === 0 ? resourceScrollbarHeight : 0;
       let schedulerContentStyle: React.CSSProperties = {
         paddingBottom: contentPaddingBottom,
-        maxHeight: this.props.styles.maxHeight,
+        maxHeight: this.props.rowMaxHeight,
       };
       let resourceContentStyle: React.CSSProperties = {
         width: this.state.actualResourceWidth + resourceScrollbarWidth - 1,
         margin: `0px -${contentScrollbarWidth}px 0px 0px`,
-        maxHeight: this.props.styles.maxHeight,
+        maxHeight: this.props.rowMaxHeight,
       };
 
-      if (this.props.styles.maxHeight > 0) {
+      if (this.props.rowMaxHeight > 0) {
         schedulerContentStyle = {
           ...schedulerContentStyle,
-          maxHeight: this.props.styles.maxHeight - this.props.styles.headerHeight,
+          maxHeight: this.props.rowMaxHeight - this.props.headerHeight,
         };
         resourceContentStyle = {
           ...resourceContentStyle,
-          maxHeight: this.props.styles.maxHeight - this.props.styles.headerHeight,
+          maxHeight: this.props.rowMaxHeight - this.props.headerHeight,
         };
-      }
-
-      const resourceName =
-        this.dataManger.yAxisDataType === 'resource'
-          ? this.dataManger.config.taskName
-          : this.dataManger.config.resourceName;
-      schedulerBody = (
-        <div>
-          <div className="rss_resource_scroll" style={{ width: this.state.actualResourceWidth }}>
-            <div className="rss_resource_container">
-              <div
-                className="rss_resource_header"
-                style={{
-                  height: this.props.styles.headerHeight,
-                }}
-              >
-                <table className="rss_resource_table">
-                  <thead>
-                    <tr style={{ height: this.props.styles.headerHeight }}>
-                      <th className="header3-text">{resourceName}</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-              <div
-                style={resourceContentStyle}
-                ref={this.resourceRef}
-                onMouseOver={this.handleResourceMouseOver}
-                onMouseOut={this.handleResourceMouseOut}
-                onScroll={this.handleResourceScroll}
-              >
-                <ResourceView scrollbarHeight={resourcePaddingBottom} />
-              </div>
-            </div>
-          </div>
-          <div className="rss_data_scroll" style={{ width: this.state.availableCellWidth }}>
-            <div
-              className="rss_data_container"
-              style={{ width: this.dataManger.dimensions.dataLength - 1 }}
-            >
-              <div
-                className="rss_data_header"
-                style={{
-                  height: this.props.styles.headerHeight,
-                }}
-              >
-                <div
-                  style={{
-                    width: this.dataManger.dimensions.dataLength,
-                    margin: `0px 0px -${contentScrollbarHeight}px`,
-                  }}
-                  ref={this.headRef}
-                  onMouseOver={this.handleHeadMouseOver}
-                  onMouseOut={this.handleHeadMouseOut}
-                  onScroll={this.handleHeadScroll}
-                >
-                  <DataHeaderView
-                    format={
-                      this.props.timePeriod === TimePeriods.Day
-                        ? this.props.timeFormat
-                        : this.props.dateFormat
-                    }
-                    height={this.props.styles.headerHeight}
-                    width={this.dataManger.dimensions.dataLength}
-                  />
-                </div>
-              </div>
-              <div
-                className="rss_data_body"
-                style={schedulerContentStyle}
-                ref={this.contentRef}
-                onMouseOver={this.handleContentMouseOver}
-                onMouseOut={this.handleContentMouseOut}
-                onScroll={this.handleContentScroll}
-              >
-                <div
-                  style={{
-                    margin: 0,
-                    width: this.dataManger.dimensions.dataLength,
-                    height: contentHeight,
-                  }}
-                >
-                  <div className="rss_movable_container">
-                    <table className="event-table">{<RenderedEventView />}</table>
-                  </div>
-                  <div className="rss_yaxis_container">
-                    <table className="rss_yaxis_table" ref={this.tableBodyRef}>
-                      <BodyView width={this.dataManger.dimensions.dataLength} />
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    const popover = (
-      <div className="popover-calendar">
-        <Calendar fullscreen={false} onSelect={this.handleDateSelect} />
-      </div>
-    );
-    let schedulerHeader = <div />;
-    if (config.showNavigator) {
-      schedulerHeader = (
-        <Row type="flex" align="middle" justify="space-between">
-          {this.props.leftCustomHeader}
-          <Col>
-            <div className="header2-text">
-              <Icon
-                type="left"
-                style={{ marginRight: '8px' }}
-                className="icon-nav"
-                onClick={this.goBack}
-              />
-              {calendarPopoverEnabled ? (
-                <Popover
-                  content={popover}
-                  placement="bottom"
-                  trigger="click"
-                  visible={this.state.visible}
-                  onVisibleChange={this.handleVisibleChange}
-                >
-                  <span className={'header2-text-label'} style={{ cursor: 'pointer' }}>
-                    {dateTitle}
-                  </span>
-                </Popover>
-              ) : (
-                <span className={'header2-text-label'}>{dateTitle}</span>
-              )}
-              <Icon
-                type="right"
-                style={{ marginLeft: '8px' }}
-                className="icon-nav"
-                onClick={this.goNext}
-              />
-            </div>
-          </Col>
-          <Col>
-            <TimePeriodSelector value={this.props.timePeriod} onChange={this.handleViewChange} />
-          </Col>
-          {this.props.rightCustomHeader}
-        </Row>
-      );
+      }*/
     }
 
     return (
-      <SchedulerContext.Provider value={{ source: this.dataManger, styles: this.props.styles }}>
+      <SchedulerContext.Provider value={{ source: this.state.source }}>
         <div
           ref={this.selfRef}
           id="rss_root"
           className="rss_container"
           style={{ width: this.isResponsive() ? this.props.width : `${this.props.width}px` }}
         >
-          <div className="rss_navigator">{schedulerHeader}</div>
-          <div className="rss_scheduler">{schedulerBody}</div>
+          <div className="rss_navigator">
+            {config.showNavigator ? this.renderHeaderNavigator() : null}
+          </div>
+          <div className="rss_scheduler">
+            <div className="rss_resource_scroll" style={{ width: this.state.actualResourceWidth }}>
+              <ResourceView
+                text="Resource Name"
+                headerHeight={this.props.headerHeight}
+                width={this.state.source.dimensions.resourceLength}
+              />
+            </div>
+            <div className="rss_data_scroll" style={{ width: this.state.availableCellWidth }}>
+              <DataView
+                headerFormat={
+                  this.props.timePeriod === TimePeriods.Day
+                    ? this.props.timeFormat
+                    : this.props.dateFormat
+                }
+                headerHeight={this.props.headerHeight}
+                width={this.state.source.dimensions.dataLength - 1}
+              />
+            </div>
+          </div>
         </div>
       </SchedulerContext.Provider>
     );

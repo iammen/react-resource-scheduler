@@ -16,7 +16,7 @@ export default class AgendaSlot extends Component<AgendaSlotProps, {}> {
   };
 
   render() {
-    const contextValue = useSchedulerContext();
+    /*const contextValue = useSchedulerContext();
     const { defaultValue } = this.props;
 
     if (contextValue.styles && contextValue.source) {
@@ -63,6 +63,7 @@ export default class AgendaSlot extends Component<AgendaSlotProps, {}> {
       );
     } else {
       return null;
-    }
+    }*/
+    return null;
   }
 }

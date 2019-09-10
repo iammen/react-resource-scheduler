@@ -8,46 +8,57 @@ export const RenderedEventView: React.FC<{}> = () => {
   if (contextValue.source) {
     const { source } = contextValue;
     return (
-      <tbody>
-        {source.yAxis
-          .filter(y => y.render)
-          .map(y => {
-            return (
-              <tr key={y.id} style={{ height: y.height }}>
-                <td style={{ width: source.dimensions.dataLength }}>
-                  {source.renderedEvents
-                    .filter(e => {
-                      const yIndex = source.yAxis.findIndex(
-                        yy => yy.id.toString() === e.resourceId.toString(),
-                      );
-                      return e.yAxisIndex === yIndex;
-                    })
-                    .map(e => {
-                      return (
-                        <div
-                          key={`${y.id}_${e.id}`}
-                          style={{
-                            position: 'relative',
-                            width: e.length,
-                            height: e.height,
-                            top: e.top,
-                            left: e.startPosition,
-                            backgroundColor: e.bgColor || 'red',
-                          }}
-                        >
-                          {`${e.text}, start: ${source
-                            .localeMoment(e.startTime)
-                            .format(DATETIME_FORMAT)}, end: ${source
-                            .localeMoment(e.endTime)
-                            .format(DATETIME_FORMAT)}`}
-                        </div>
-                      );
-                    })}
-                </td>
-              </tr>
-            );
-          })}
-      </tbody>
+      <table className="rss_event_table">
+        <tbody>
+          {source.yAxis
+            .filter(y => y.render)
+            .map(y => {
+              return (
+                <tr key={y.id} style={{ height: y.height }}>
+                  <td>
+                    <div
+                      style={{
+                        position: 'relative',
+                        height: y.height,
+                        width: source.dimensions.dataLength - 1,
+                      }}
+                    >
+                      {y.relatedIds.map(resourceId => {
+                        const evt = source.renderedEvents.find(
+                          re => re.id.toString() === resourceId.toString(),
+                        );
+
+                        if (evt) {
+                          return (
+                            <div
+                              key={`${y.id}_${evt.id}`}
+                              draggable
+                              style={{
+                                position: 'absolute',
+                                width: evt.length,
+                                height: evt.height,
+                                top: evt.top,
+                                left: evt.startPosition,
+                                backgroundColor: evt.bgColor || 'red',
+                                fontSize: 14,
+                                border: '1px solid #999999',
+                                borderRadius: 3,
+                              }}
+                            >
+                              {evt.resourceId}
+                            </div>
+                          );
+                        } else {
+                          return null;
+                        }
+                      })}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+        </tbody>
+      </table>
     );
   } else {
     return null;

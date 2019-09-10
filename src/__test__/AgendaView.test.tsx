@@ -1,7 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import AgendaView from '../AgendaView';
-import { TimePeriods } from '../enum';
 import DemoData from './DemoData';
 import * as AppContext from '../SchedulerContext';
 import { SchedulerDataManger } from '../SchedulerDataManager';
@@ -10,21 +9,20 @@ describe('<AgendaView />', () => {
   const styles = {
     cellWidth: 40,
     headerHeight: 40,
-    maxHeight: 0,
-    slotHeaderWidth: 160,
-    slotHeight: 40,
+    rowMaxHeight: 0,
+    rowHeight: 40,
   };
 
   it('it should mock with context', () => {
     const schedulerData = new SchedulerDataManger({
       currentDate: '2017-12-18',
-      viewType: TimePeriods.Week,
+      timePeriod: 'week',
       resources: DemoData.resources,
       events: DemoData.events,
       language: 'th',
     });
     const contextValue = {
-      source: schedulerData,
+      source: schedulerData.getSource(),
       styles,
     };
 

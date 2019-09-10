@@ -16,7 +16,7 @@ export interface EventPopoverProps {
 const EventPopover: React.FC<EventPopoverProps> = ({ endTime, startTime, statusColor, text }) => {
   const contextValue = useSchedulerContext();
 
-  if (contextValue.styles && contextValue.source) {
+  if (contextValue.source) {
     const { localeMoment } = contextValue.source;
     const start = localeMoment(startTime);
     const end = localeMoment(endTime);

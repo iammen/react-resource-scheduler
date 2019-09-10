@@ -3,8 +3,6 @@ import * as PropTypes from 'prop-types';
 import Popover from 'antd/lib/popover';
 import 'antd/lib/popover/style/index.css';
 import EventPopover from './EventPopover';
-import { getEventText } from './_util/getEventText';
-import { Event } from './interface';
 import { useSchedulerContext } from './SchedulerContext';
 
 export interface AgendaCellProps {
@@ -24,8 +22,7 @@ export default class AgendaCell extends Component<AgendaCellProps, {}> {
     const contextValue = useSchedulerContext();
     const { defaultValue, isStart, isEnd } = this.props;
 
-    if (contextValue.source && contextValue.styles) {
-      const { config } = contextValue.source;
+    if (contextValue.source) {
       const roundCls = isStart
         ? isEnd
           ? 'round-all'
@@ -38,7 +35,7 @@ export default class AgendaCell extends Component<AgendaCellProps, {}> {
         bgColor = '#80C5F6';
       }
 
-      const titleText = getEventText(contextValue.source, defaultValue);
+      const titleText = 'Event';
       const content = (
         <EventPopover
           text={defaultValue.text}
@@ -52,14 +49,12 @@ export default class AgendaCell extends Component<AgendaCellProps, {}> {
           className={roundCls + ' event-item'}
           key={defaultValue.id}
           style={{
-            height: config.eventItemHeight,
-            maxWidth: config.agendaMaxEventWidth,
+            height: 20,
+            maxWidth: 20,
             backgroundColor: bgColor,
           }}
         >
-          <span style={{ marginLeft: '10px', lineHeight: `${config.eventItemHeight}px` }}>
-            {titleText}
-          </span>
+          <span style={{ marginLeft: '10px', lineHeight: `${20}px` }}>{titleText}</span>
         </div>
       );
 
