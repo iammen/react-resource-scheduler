@@ -11,6 +11,7 @@ import BodyView from './BodyView';
 import DataHeaderView from './DataHeaderView';
 import ResourceView from './ResourceView';
 import AgendaView from './AgendaView';
+import { RenderedEventView } from './RenderedEventView';
 import { TimePeriodSelector } from './TimePeriodSelector';
 
 import 'antd/lib/select/style/index.css';
@@ -626,9 +627,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
                   }}
                 >
                   <div className="rss_movable_container">
-                    <table className="event-table">
-                      <tbody>{/*resourceEventsList*/ null}</tbody>
-                    </table>
+                    <table className="event-table">{<RenderedEventView />}</table>
                   </div>
                   <div className="rss_yaxis_container">
                     <table className="rss_yaxis_table" ref={this.tableBodyRef}>

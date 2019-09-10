@@ -63,6 +63,7 @@ export interface RenderedEvent {
   startTime: Date;
   startPosition: number;
   text: string;
+  top: number;
   yAxisIndex: number;
 }
 
