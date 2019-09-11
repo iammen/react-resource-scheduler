@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { TimePeriod } from './Scheduler';
 
 export type ID = number | string;
 
@@ -76,6 +77,7 @@ export interface Resource {
 
 export interface SchedulerDataConfig {
   agendaMaxEventWidth: number;
+  bottomScrollbarHeight: number;
   calendarPopoverEnabled: boolean;
   checkConflict: boolean;
   creatable: boolean;
@@ -95,25 +97,26 @@ export interface SchedulerDataConfig {
   recurringEventsEnabled: boolean;
   relativeMove: boolean;
   resourceName: string;
-  scrollToSpecialMomentEnabled: boolean;
+  rightScrollbarWidth: number;
   showNavigator: boolean;
   summaryPosition: number;
   taskName: string;
 }
 
 export interface SchedulerDimension {
-  containerLength: number;
+  containerWidth: number;
   dataHeight: number;
-  dataLength: number;
-  dataUnitLength: number;
-  minimumDataUnitLength: number;
-  resourceLength: number;
+  dataWidth: number;
+  dataSlotWidth: number;
+  minimumDataSlotWidth: number;
+  labelWidth: number;
 }
 
 export interface SchedulerSource {
   dimensions: SchedulerDimension;
   localeMoment: typeof moment;
   renderedEvents: RenderedEvent[];
+  timePeriod: TimePeriod;
   xAxis: XAxis[];
   yAxis: YAxis[];
 }

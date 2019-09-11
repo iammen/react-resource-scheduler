@@ -5,20 +5,20 @@ import { useSchedulerContext } from './SchedulerContext';
 import { YAxis } from './interface';
 
 export interface ResourceViewProps {
-  headerHeight: number;
   text?: string;
   width: number;
 }
 
-const ResourceView: React.FC<ResourceViewProps> = ({ headerHeight, text, width }) => {
+const ResourceView: React.FC<ResourceViewProps> = ({ text, width }) => {
   const contextValue = useSchedulerContext();
 
   if (contextValue.source) {
+    const { dimensions } = contextValue.source;
     return (
       <div className="rss_resource_container" style={{ width }}>
-        <table className="rss_resource_table">
+        <table className="rss_resource_table" cellSpacing={0} cellPadding={0}>
           <thead>
-            <tr style={{ height: headerHeight }}>
+            <tr style={{ height: 40 }}>
               <th className="header3-text" style={{ width }}>
                 {text || 'Resources'}
               </th>
@@ -72,7 +72,6 @@ const ResourceView: React.FC<ResourceViewProps> = ({ headerHeight, text, width }
 };
 
 ResourceView.propTypes = {
-  headerHeight: PropTypes.number.isRequired,
   text: PropTypes.string,
   width: PropTypes.number.isRequired,
 };

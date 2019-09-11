@@ -4,13 +4,15 @@ import { useSchedulerContext } from './SchedulerContext';
 import moment from 'moment';
 import { XAxis } from './interface';
 
-export interface DataHeaderViewProps {
+export interface HeaderViewProps {
   format?: string;
   height: number;
-  width: number;
+  labelWidth: number;
+  title?: string;
+  width?: number | string;
 }
 
-const DataHeaderView: React.FC<DataHeaderViewProps> = ({ format, height, width }) => {
+const HeaderView: React.FC<HeaderViewProps> = ({ format, height, labelWidth, title, width }) => {
   const contextValue = useSchedulerContext();
 
   const renderHeader = (x: XAxis, locale: typeof moment, headerFormat?: string) => {
@@ -18,18 +20,20 @@ const DataHeaderView: React.FC<DataHeaderViewProps> = ({ format, height, width }
       ? headerFormat
           .split('\n')
           .map(f => locale(x.startTime).format(f))
-          .map((text, i) => <div key={i}>{text}</div>)
+          .map((txt, i) => <div key={i}>{txt}</div>)
       : [];
   };
 
   if (contextValue.source) {
     const { xAxis, localeMoment } = contextValue.source;
-    const minuteStepsInHour = 1;
 
     return (
-      <table className="rss_data_header_table">
+      <table className="rss_data_header_table" cellSpacing={0} cellPadding={0} style={{ width }}>
         <thead>
           <tr style={{ height }}>
+            <th className="header3-text" style={{ width: labelWidth }}>
+              {title}
+            </th>
             {xAxis.map((x, index) => {
               return (
                 <th
@@ -50,14 +54,17 @@ const DataHeaderView: React.FC<DataHeaderViewProps> = ({ format, height, width }
   }
 };
 
-DataHeaderView.propTypes = {
+HeaderView.propTypes = {
   format: PropTypes.string,
   height: PropTypes.number.isRequired,
-  width: PropTypes.number.isRequired,
+  title: PropTypes.string,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
-DataHeaderView.defaultProps = {
+HeaderView.defaultProps = {
   format: 'ddd M/D',
+  title: '',
+  width: '100%',
 };
 
-export default DataHeaderView;
+export default HeaderView;

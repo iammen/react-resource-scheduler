@@ -2,14 +2,12 @@ import moment from 'moment';
 import { rrulestr } from 'rrule';
 import config from './constants';
 import {
-  Cell,
   CustomSchedulerDate,
   Event,
   EventGroup,
   Resource,
   SchedulerDataConfig,
   XAxisHeader,
-  Slot,
   SchedulerDimension,
   XAxis,
   YAxis,
@@ -17,7 +15,7 @@ import {
   SchedulerSource,
 } from './interface';
 import { TimePeriods, CellUnits, ViewTypes, YAxisDataTypes } from './enum';
-import { DATE_FORMAT, DATETIME_FORMAT } from './constants';
+import { DATETIME_FORMAT } from './constants';
 import { isWorkingTime } from './_util/isWorkingTime';
 import { ViewType, TimePeriod } from './Scheduler';
 
@@ -124,12 +122,12 @@ export class SchedulerDataManger {
     this.eventHeight = 30;
 
     this.dimensions = {
-      containerLength: 0,
+      containerWidth: 0,
       dataHeight: 0,
-      dataLength: 0,
-      dataUnitLength: 0,
-      minimumDataUnitLength: 0,
-      resourceLength: 0,
+      dataWidth: 0,
+      dataSlotWidth: 0,
+      minimumDataSlotWidth: 0,
+      labelWidth: 0,
     };
 
     this.validateMinuteStep(this.minuteStep);
@@ -174,13 +172,6 @@ export class SchedulerDataManger {
     return this.startDate.format('MMM D, YYYY');
   }
 
-  public getScrollToSpecialMoment() {
-    if (this.config.scrollToSpecialMomentEnabled) {
-      return this.scrollToSpecialMoment;
-    }
-    return false;
-  }
-
   public getSource() {
     return {
       dimensions: { ...this.dimensions },
@@ -197,12 +188,12 @@ export class SchedulerDataManger {
     this.reloadAll();
   }
 
-  public recalDimensions(containerLength: number, resourceLength: number) {
-    this.dimensions.containerLength = containerLength;
-    this.dimensions.resourceLength = resourceLength;
-    this.dimensions.dataLength = containerLength - resourceLength;
-    this.recalXAxisLength();
-    this.recalRenderedEventLength();
+  public recalDimensions(containerWidth: number, labelWidth: number) {
+    this.dimensions.containerWidth = containerWidth;
+    this.dimensions.labelWidth = labelWidth;
+    this.dimensions.dataWidth = containerWidth - labelWidth;
+    this.calculateXAxisWidth();
+    this.calculateRenderedEventWidth();
   }
 
   public setDate(date?: moment.Moment) {
@@ -248,13 +239,6 @@ export class SchedulerDataManger {
       this.validateResource(resources);
       this.resources = resources;
       this.generateRenderedEvents();
-      this.setScrollToSpecialMoment(true);
-    }
-  }
-
-  public setScrollToSpecialMoment(scrollToSpecialMoment: boolean) {
-    if (this.config.scrollToSpecialMomentEnabled) {
-      this.scrollToSpecialMoment = scrollToSpecialMoment;
     }
   }
 
@@ -278,27 +262,129 @@ export class SchedulerDataManger {
     this.events.splice(pos, 0, event);
   }
 
-  private calculateDataUnitLength() {
+  private calculateDataHeight() {
+    this.dimensions.dataHeight = 0;
+    this.yAxis.forEach(y => {
+      if (y.render) {
+        this.dimensions.dataHeight += y.height;
+      }
+    });
+  }
+
+  private calculateDataSlotWidth() {
     if (
       this.timePeriod === TimePeriods.Day ||
       this.timePeriod === TimePeriods.Week ||
       this.timePeriod === TimePeriods.Month
     ) {
-      this.dimensions.dataUnitLength = Number(
-        (this.dimensions.dataLength / this.xAxis.length).toFixed(0),
+      this.dimensions.dataSlotWidth = Number(
+        (this.dimensions.dataWidth / this.xAxis.length).toFixed(0),
       );
-      this.dimensions.minimumDataUnitLength =
+      this.dimensions.minimumDataSlotWidth =
         this.timePeriod === TimePeriods.Week
-          ? Number((this.dimensions.dataLength / (7 * 24)).toFixed(0))
+          ? Number((this.dimensions.dataWidth / (7 * 24)).toFixed(0))
           : this.timePeriod === TimePeriods.Month
-          ? Number((this.dimensions.dataUnitLength / (this.xAxis.length * 24)).toFixed(0))
-          : Number((this.dimensions.dataLength / (24 * 60)).toFixed(0));
+          ? Number((this.dimensions.dataSlotWidth / (this.xAxis.length * 24)).toFixed(0))
+          : Number((this.dimensions.dataWidth / (24 * 60)).toFixed(0));
     } else {
-      this.dimensions.dataUnitLength = this.config.defaultDataUnitLength;
-      this.dimensions.minimumDataUnitLength = Number(
-        (this.dimensions.dataUnitLength / (this.xAxis.length * 24)).toFixed(0),
+      this.dimensions.dataSlotWidth = this.config.defaultDataUnitLength;
+      this.dimensions.minimumDataSlotWidth = Number(
+        (this.dimensions.dataSlotWidth / (this.xAxis.length * 24)).toFixed(0),
       );
     }
+  }
+
+  private calculateRenderedEventWidth() {
+    if (
+      this.dimensions.containerWidth > 0 &&
+      this.dimensions.labelWidth > 0 &&
+      this.xAxis.length > 0 &&
+      this.yAxis.length > 0
+    ) {
+      this.renderedEvents.forEach(e => {
+        let renderedUnit = 0;
+        let index;
+        e.startPosition = -1;
+
+        for (index = 0; index < this.xAxis.length; index++) {
+          if (
+            e.startTime >= this.xAxis[index].startTime &&
+            e.startTime < this.xAxis[index].endTime
+          ) {
+            e.startPosition = index * this.dimensions.dataSlotWidth;
+          }
+
+          if (e.endTime >= this.xAxis[index].startTime && e.endTime <= this.xAxis[index].endTime) {
+            renderedUnit++;
+            break;
+          } else {
+            if (e.startPosition > -1) {
+              renderedUnit++;
+            }
+          }
+        }
+
+        e.length =
+          index === this.xAxis.length - 1
+            ? renderedUnit * this.dimensions.dataSlotWidth
+            : renderedUnit * this.dimensions.dataSlotWidth;
+      });
+
+      // Align top.
+      this.yAxis.forEach(y => {
+        y.relatedIds.forEach((e, eIndex) => {
+          const index = this.renderedEvents.findIndex(r => r.id.toString() === e.toString());
+          if (index > -1) {
+            this.renderedEvents[index].top = eIndex * this.eventHeight;
+          }
+        });
+      });
+    }
+  }
+
+  private calculateXAxisWidth() {
+    if (
+      this.dimensions.containerWidth > 0 &&
+      this.dimensions.labelWidth > 0 &&
+      this.xAxis.length > 0
+    ) {
+      this.calculateDataSlotWidth();
+
+      // Re-assign all x-axis length.
+      this.xAxis.forEach((x, indx) => {
+        x.length = indx === this.xAxis.length - 1 ? 0 : this.dimensions.dataSlotWidth;
+      });
+    }
+  }
+
+  private calculateYAxisHeight() {
+    const endDate =
+      this.timePeriod === TimePeriods.Day
+        ? this.localeMoment(this.endDate.toDate()).add(1, 'days')
+        : this.endDate;
+
+    // Loop through all events.
+    this.events.forEach(evt => {
+      // Find the y-axis that matches an event and then re-calculate the height.
+      this.yAxis.forEach(y => {
+        if (y.id.toString() === this.getEventResourceId(evt)) {
+          const startTime = this.localeMoment(evt.start, DATETIME_FORMAT);
+
+          if (
+            startTime.isSameOrBefore(endDate) &&
+            y.relatedIds.findIndex(r => r.toString() === evt.id.toString()) === -1
+          ) {
+            y.relatedIds.push(evt.id);
+          }
+
+          y.height = y.relatedIds.length * this.eventHeight;
+        }
+
+        if (y.height < this.yAxisHeight) {
+          y.height = this.yAxisHeight;
+        }
+      });
+    });
   }
 
   private detachEvent(event: Event) {
@@ -610,116 +696,15 @@ export class SchedulerDataManger {
     });
   }
 
-  private recalDataHeight() {
-    this.dimensions.dataHeight = 0;
-    this.yAxis.forEach(y => {
-      if (y.render) {
-        this.dimensions.dataHeight += y.height;
-      }
-    });
-  }
-
-  private recalRenderedEventLength() {
-    if (
-      this.dimensions.containerLength > 0 &&
-      this.dimensions.resourceLength > 0 &&
-      this.xAxis.length > 0 &&
-      this.yAxis.length > 0
-    ) {
-      this.renderedEvents.forEach(e => {
-        let renderedUnit = 0;
-        let index;
-        e.startPosition = -1;
-
-        for (index = 0; index < this.xAxis.length; index++) {
-          if (
-            e.startTime >= this.xAxis[index].startTime &&
-            e.startTime < this.xAxis[index].endTime
-          ) {
-            e.startPosition = index * this.dimensions.dataUnitLength;
-          }
-
-          if (e.endTime >= this.xAxis[index].startTime && e.endTime <= this.xAxis[index].endTime) {
-            renderedUnit++;
-            break;
-          } else {
-            if (e.startPosition > -1) {
-              renderedUnit++;
-            }
-          }
-        }
-
-        e.length =
-          index === this.xAxis.length - 1
-            ? renderedUnit * this.dimensions.dataUnitLength
-            : renderedUnit * this.dimensions.dataUnitLength;
-      });
-
-      // Align top.
-      this.yAxis.forEach(y => {
-        y.relatedIds.forEach((e, eIndex) => {
-          const index = this.renderedEvents.findIndex(r => r.id.toString() === e.toString());
-          if (index > -1) {
-            this.renderedEvents[index].top = eIndex * this.eventHeight;
-          }
-        });
-      });
-    }
-  }
-
-  private recalXAxisLength() {
-    if (
-      this.dimensions.containerLength > 0 &&
-      this.dimensions.resourceLength > 0 &&
-      this.xAxis.length > 0
-    ) {
-      this.calculateDataUnitLength();
-
-      // Re-assign all x-axis length.
-      this.xAxis.forEach((x, indx) => {
-        x.length = indx === this.xAxis.length - 1 ? 0 : this.dimensions.dataUnitLength;
-      });
-    }
-  }
-
-  private recalYAxisLength() {
-    const endDate =
-      this.timePeriod === TimePeriods.Day
-        ? this.localeMoment(this.endDate.toDate()).add(1, 'days')
-        : this.endDate;
-
-    // Loop through all events.
-    this.events.forEach(evt => {
-      // Find the y-axis that matches an event and then re-calculate the height.
-      this.yAxis.forEach(y => {
-        if (y.id.toString() === this.getEventResourceId(evt)) {
-          const startTime = this.localeMoment(evt.start, DATETIME_FORMAT);
-
-          if (
-            startTime.isSameOrBefore(endDate) &&
-            y.relatedIds.findIndex(r => r.toString() === evt.id.toString()) === -1
-          ) {
-            y.relatedIds.push(evt.id);
-          }
-
-          y.height = y.relatedIds.length * this.eventHeight;
-        }
-
-        if (y.height < this.yAxisHeight) {
-          y.height = this.yAxisHeight;
-        }
-      });
-    });
-  }
-
   private reloadAll() {
     this.generateXAxis();
     this.generateYAxis();
-    this.recalXAxisLength();
-    this.recalYAxisLength();
-    this.recalDataHeight();
+    this.calculateXAxisWidth();
+    this.calculateYAxisHeight();
+    this.calculateDataHeight();
     this.generateRenderedEvents();
-    this.recalRenderedEventLength();
+    this.calculateRenderedEventWidth();
+    console.log(this.dimensions);
   }
 
   private resolveDateRange(date: moment.Moment) {

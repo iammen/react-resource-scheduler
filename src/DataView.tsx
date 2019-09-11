@@ -4,14 +4,14 @@ import moment from 'moment';
 import { useSchedulerContext } from './SchedulerContext';
 import { XAxis, YAxis } from './interface';
 import RenderedEventView from './RenderedEventView';
+import { TimePeriods } from './enum';
 
 export interface DataViewProps {
   headerFormat: string;
-  headerHeight: number;
   width: number;
 }
 
-const DataView: React.FC<DataViewProps> = ({ headerHeight, headerFormat, width }) => {
+const DataView: React.FC<DataViewProps> = ({ headerFormat, width }) => {
   const contextValue = useSchedulerContext();
 
   const renderHeader = (x: XAxis, locale: typeof moment, format?: string) => {
@@ -42,36 +42,42 @@ const DataView: React.FC<DataViewProps> = ({ headerHeight, headerFormat, width }
   };
 
   if (contextValue.source) {
-    const { dimensions, localeMoment, xAxis } = contextValue.source;
-    const style: React.CSSProperties =
-      dimensions.dataUnitLength * xAxis.length > width
-        ? { paddingBottom: 10 }
-        : { paddingBottom: 0 };
+    const { dimensions, localeMoment, xAxis, timePeriod } = contextValue.source;
+    const overflowX: React.CSSProperties =
+      timePeriod === TimePeriods.Quarter || timePeriod === TimePeriods.Year
+        ? { overflowX: 'scroll' }
+        : {};
+    const innerWidth: React.CSSProperties =
+      timePeriod === TimePeriods.Quarter || timePeriod === TimePeriods.Year
+        ? { width: dimensions.dataSlotWidth * xAxis.length }
+        : { width: '100%' };
 
     return (
-      <div className="rss_data_container" style={{ ...style, width }}>
-        <table className="rss_data_table" cellSpacing={0} cellPadding={0}>
-          <thead>
-            <tr style={{ height: headerHeight }}>
-              {xAxis.map((x, index) => {
-                return (
-                  <th
-                    key={`header_${index}`}
-                    className={`header-text ${x.workingTime ? 'bg-normal' : 'bg-highlight'}`}
-                    style={x.length > 0 ? { width: x.length } : {}}
-                  >
-                    {renderHeader(x, localeMoment, headerFormat)}
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {contextValue.source.yAxis.filter(y => y.render).map(y => renderBody(xAxis, y))}
-          </tbody>
-        </table>
-        <div style={{ position: 'absolute', top: headerHeight }}>
-          <RenderedEventView />
+      <div className="rss_data_scroll" style={{ ...overflowX, width }}>
+        <div className="rss_data_container" style={innerWidth}>
+          <table className="rss_data_table" cellSpacing={0} cellPadding={0}>
+            <thead>
+              <tr style={{ height: 40 }}>
+                {xAxis.map((x, index) => {
+                  return (
+                    <th
+                      key={`header_${index}`}
+                      className={`header-text ${x.workingTime ? 'bg-normal' : 'bg-highlight'}`}
+                      style={x.length > 0 ? { width: x.length } : {}}
+                    >
+                      {renderHeader(x, localeMoment, headerFormat)}
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {contextValue.source.yAxis.filter(y => y.render).map(y => renderBody(xAxis, y))}
+            </tbody>
+          </table>
+          <div style={{ position: 'absolute', top: 40 }}>
+            <RenderedEventView />
+          </div>
         </div>
       </div>
     );
@@ -82,7 +88,6 @@ const DataView: React.FC<DataViewProps> = ({ headerHeight, headerFormat, width }
 
 DataView.propTypes = {
   headerFormat: PropTypes.string.isRequired,
-  headerHeight: PropTypes.number.isRequired,
   width: PropTypes.number.isRequired,
 };
 

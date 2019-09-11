@@ -9,7 +9,7 @@ import Popover from 'antd/lib/popover';
 import Calendar from 'antd/lib/calendar';
 import DataView from './DataView';
 import BodyView from './BodyView';
-import DataHeaderView from './DataHeaderView';
+import HeaderView from './HeaderView';
 import ResourceView from './ResourceView';
 import AgendaView from './AgendaView';
 import RenderedEventView from './RenderedEventView';
@@ -195,7 +195,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   }
 
   componentDidMount() {
-    this.resolveScrollbarSize();
+    this.recalSchedulerWidth();
   }
 
   componentDidUpdate() {
@@ -363,7 +363,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
   };
 
   handleWindowResize = () => {
-    this.resolveScrollbarSize();
+    this.recalSchedulerWidth();
   };
 
   isResponsive() {
@@ -372,6 +372,20 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
 
   isResourceResponsive() {
     return this.props.resourceWidth.toString().endsWith('%');
+  }
+
+  recalSchedulerWidth() {
+    if (this.selfRef.current && this.state.schedulerWidth !== this.selfRef.current.clientWidth) {
+      const schedulerWidth = this.selfRef.current.clientWidth;
+      const resourceWidth = this.resolveResourceWidth();
+      this.dataManger.recalDimensions(schedulerWidth, resourceWidth);
+      this.source = this.dataManger.getSource();
+
+      this.setState({
+        resourceWidth,
+        schedulerWidth,
+      });
+    }
   }
 
   resolveResourceWidth() {
@@ -420,8 +434,9 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
 
     let states = {};
     let isStateChange = false;
-    if (this.selfRef.current && this.state.schedulerWidth !== this.selfRef.current.clientWidth) {
-      const schedulerWidth = this.selfRef.current.clientWidth;
+    /*if (this.selfRef.current && this.state.schedulerWidth !== this.selfRef.current.offsetWidth) {
+      console.log(this.state.schedulerWidth, this.selfRef.current.offsetWidth);
+      const schedulerWidth = this.selfRef.current.offsetWidth;
       const resourceWidth = this.resolveResourceWidth();
       this.dataManger.recalDimensions(schedulerWidth, resourceWidth);
       this.source = this.dataManger.getSource();
@@ -432,7 +447,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
         schedulerWidth,
       };
       isStateChange = true;
-    }
+    }*/
     if (contentScrollbarHeight !== this.state.contentScrollbarHeight) {
       states = { ...states, contentScrollbarHeight };
       isStateChange = true;
@@ -561,7 +576,9 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
     }
 
     return (
-      <SchedulerContext.Provider value={{ source: this.source }}>
+      <SchedulerContext.Provider
+        value={{ source: { ...this.source, timePeriod: this.props.timePeriod } }}
+      >
         <div
           ref={this.selfRef}
           id="rss_root"
@@ -573,23 +590,17 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
           </div>
           <div className="rss_scheduler">
             <div className="rss_resource_scroll" style={{ width: this.state.resourceWidth }}>
-              <ResourceView
-                text="Resource Name"
-                headerHeight={this.props.headerHeight}
-                width={this.source.dimensions.resourceLength}
-              />
+              <ResourceView text="Resource Name" width={this.source.dimensions.labelWidth} />
             </div>
-            <div className="rss_data_scroll" style={{ width: this.source.dimensions.dataLength }}>
-              <DataView
-                headerFormat={
-                  this.props.timePeriod === TimePeriods.Day
-                    ? this.props.timeFormat
-                    : this.props.dateFormat
-                }
-                headerHeight={this.props.headerHeight}
-                width={this.source.dimensions.dataLength}
-              />
-            </div>
+
+            <DataView
+              headerFormat={
+                this.props.timePeriod === TimePeriods.Day
+                  ? this.props.timeFormat
+                  : this.props.dateFormat
+              }
+              width={this.source.dimensions.dataWidth - 1}
+            />
           </div>
         </div>
       </SchedulerContext.Provider>
