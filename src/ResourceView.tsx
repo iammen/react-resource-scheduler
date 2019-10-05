@@ -2,7 +2,6 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import Icon from 'antd/lib/icon';
 import { useSchedulerContext } from './SchedulerContext';
-import { YAxis } from './interface';
 
 export interface ResourceViewProps {
   text?: string;

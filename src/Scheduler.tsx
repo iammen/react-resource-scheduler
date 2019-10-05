@@ -340,10 +340,7 @@ export default class Scheduler extends Component<SchedulerProps, SchedulerStates
 
   handleDateSelect = (date?: moment.Moment) => {
     if (date) {
-      this.setState({
-        visible: false,
-      });
-
+      this.setState({ visible: false });
       this.props.onSelectDate(this.dataManger, date);
     }
   };

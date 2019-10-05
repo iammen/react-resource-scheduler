@@ -86,13 +86,14 @@ export class SchedulerDataManger {
 
   // Line height of an event.
   private eventHeight: number;
+  private eventMargin: number;
 
   // An array of X, Y Axis.
   private xAxis: XAxis[];
   private yAxis: YAxis[];
 
-  // Height per slot.
-  private yAxisHeight: number;
+  // Minimum height per slot.
+  private minSlotHeight: number;
 
   constructor(args: Partial<InitProps>) {
     this.resources = args.resources || [];
@@ -118,8 +119,9 @@ export class SchedulerDataManger {
     this.startTimeOfDay = 0;
     this.endTimeOfDay = 23;
     this.minuteStep = args.minuteStep || 60;
-    this.yAxisHeight = 40;
+    this.minSlotHeight = 38;
     this.eventHeight = 30;
+    this.eventMargin = 4;
 
     this.dimensions = {
       containerWidth: 0,
@@ -301,41 +303,49 @@ export class SchedulerDataManger {
       this.xAxis.length > 0 &&
       this.yAxis.length > 0
     ) {
-      this.renderedEvents.forEach(e => {
+      this.renderedEvents.forEach(evt => {
         let renderedUnit = 0;
         let index;
-        e.startPosition = -1;
+        evt.startPosition = -1;
 
         for (index = 0; index < this.xAxis.length; index++) {
           if (
-            e.startTime >= this.xAxis[index].startTime &&
-            e.startTime < this.xAxis[index].endTime
+            evt.startTime >= this.xAxis[index].startTime &&
+            evt.startTime < this.xAxis[index].endTime
           ) {
-            e.startPosition = index * this.dimensions.dataSlotWidth;
+            evt.startPosition = index * this.dimensions.dataSlotWidth;
           }
 
-          if (e.endTime >= this.xAxis[index].startTime && e.endTime <= this.xAxis[index].endTime) {
+          if (
+            evt.endTime >= this.xAxis[index].startTime &&
+            evt.endTime <= this.xAxis[index].endTime
+          ) {
             renderedUnit++;
             break;
           } else {
-            if (e.startPosition > -1) {
+            if (evt.startPosition > -1) {
               renderedUnit++;
             }
           }
         }
 
-        e.length =
+        evt.length =
           index === this.xAxis.length - 1
             ? renderedUnit * this.dimensions.dataSlotWidth
             : renderedUnit * this.dimensions.dataSlotWidth;
       });
 
-      // Align top.
+      // Align top of each rendered events.
       this.yAxis.forEach(y => {
-        y.relatedIds.forEach((e, eIndex) => {
-          const index = this.renderedEvents.findIndex(r => r.id.toString() === e.toString());
+        y.relatedIds.forEach((evt, indx) => {
+          const index = this.renderedEvents.findIndex(r => r.id.toString() === evt.toString());
           if (index > -1) {
-            this.renderedEvents[index].top = eIndex * this.eventHeight;
+            if (indx === 0) {
+              this.renderedEvents[index].top = this.eventMargin;
+            } else {
+              this.renderedEvents[index].top =
+                indx * this.eventHeight + (indx + 1) * this.eventMargin;
+            }
           }
         });
       });
@@ -350,13 +360,16 @@ export class SchedulerDataManger {
     ) {
       this.calculateDataSlotWidth();
 
-      // Re-assign all x-axis length.
+      // Re-assign all X-axis length.
       this.xAxis.forEach((x, indx) => {
         x.length = indx === this.xAxis.length - 1 ? 0 : this.dimensions.dataSlotWidth;
       });
     }
   }
 
+  /**
+   * Calculate the height of each Y-axis.
+   */
   private calculateYAxisHeight() {
     const endDate =
       this.timePeriod === TimePeriods.Day
@@ -377,11 +390,11 @@ export class SchedulerDataManger {
             y.relatedIds.push(evt.id);
           }
 
-          y.height = y.relatedIds.length * this.eventHeight;
+          y.height = y.relatedIds.length * (this.eventHeight + this.eventMargin) + this.eventMargin;
         }
 
-        if (y.height < this.yAxisHeight) {
-          y.height = this.yAxisHeight;
+        if (y.height < this.minSlotHeight) {
+          y.height = this.minSlotHeight;
         }
       });
     });
@@ -422,7 +435,7 @@ export class SchedulerDataManger {
         const renderdEvents: RenderedEvent[] = [];
 
         yAxis.forEach(y => {
-          const yAxisIndex = this.yAxis.findIndex(yy => yy.id.toString() === y.id.toString());
+          const yAxisIndex = this.yAxis.findIndex(yi => yi.id.toString() === y.id.toString());
 
           renderdEvents.push({
             id: e.id,
@@ -704,7 +717,6 @@ export class SchedulerDataManger {
     this.calculateDataHeight();
     this.generateRenderedEvents();
     this.calculateRenderedEventWidth();
-    console.log(this.dimensions);
   }
 
   private resolveDateRange(date: moment.Moment) {

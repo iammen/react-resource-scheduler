@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import PropTypes from 'prop-types';
 import { SchedulerContext } from './SchedulerContext';
 
 const RenderedEventView: React.FC<{}> = () => {
@@ -39,10 +38,9 @@ const RenderedEventView: React.FC<{}> = () => {
                                 height: evt.height,
                                 top: evt.top,
                                 left: evt.startPosition,
-                                backgroundColor: evt.bgColor || 'red',
+                                backgroundColor: evt.bgColor || '#1E95F3',
                                 fontSize: 14,
-                                border: '1px solid #999999',
-                                borderRadius: 3,
+                                borderRadius: 2,
                               }}
                             >
                               {evt.resourceId}
